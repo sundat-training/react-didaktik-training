@@ -40,6 +40,7 @@
     <code>React</code>
     <code>TypeScript</code>
     <code>react-router-dom</code>
+    <code>Tailwind CSS</code>
     <code>tsconfig paths</code>
   </div>
 </div>
@@ -48,7 +49,7 @@
   <h2>📋 Aufgabe</h2>
   <ol>
     <li><span class="step">1.</span> Erstelle ein neues Vite-Projekt mit React + TypeScript Template.</li>
-    <li><span class="step">2.</span> Installiere React Router DOM für clientseitige Navigation.</li>
+    <li><span class="step">2.</span> Installiere React Router DOM und Tailwind CSS.</li>
     <li><span class="step">3.</span> Lege die empfohlene Projektstruktur an.</li>
     <li><span class="step">4.</span> Richte den Router mit einer Startseite und einer About-Seite ein.</li>
     <li><span class="step">5.</span> Erstelle ein Root-Layout mit Navigation (Navbar + Outlet).</li>
@@ -63,8 +64,9 @@ npm create vite@latest mein-projekt -- --template react-ts
 cd mein-projekt
 npm install
 
-<span class="cm"># 2. React Router hinzufügen</span>
+<span class="cm"># 2. React Router + Tailwind hinzufügen</span>
 npm install react-router-dom
+npm install -D tailwindcss @tailwindcss/vite
 
 <span class="cm"># 3. (Optional) Pfad-Alias-Unterstützung</span>
 npm install -D vite-tsconfig-paths</code></pre>
@@ -109,6 +111,16 @@ export const router = createBrowserRouter([
     ],
   },
 ]);</code></pre>
+    <p><strong>Tailwind in <code>vite.config.ts</code> aktivieren:</strong></p>
+    <pre><code>import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+});</code></pre>
+    <p><strong>Tailwind-Direktive in <code>src/index.css</code> (Datei anlegen):</strong></p>
+    <pre><code>@import "tailwindcss";</code></pre>
     <p><code>src/main.tsx</code>:</p>
     <pre><code>import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -220,7 +232,8 @@ export default defineConfig({
     <li>React Router v7 (react-router-dom) verwendet <code>createBrowserRouter</code> – das ist der empfohlene Weg für TypeScript-Projekte.</li>
     <li>Der <code>&lt;Outlet /&gt;</code> im Layout rendert die jeweilige Kind-Route. Ohne ihn wird nichts angezeigt.</li>
     <li><code>NavLink</code> von React Router bietet automatische <code>isActive</code>-Erkennung – ideal für Navigationsmenüs.</li>
-    <li>Lege einen <code>index.css</code>-Globalstyle an (z.B. Tailwind-CSS oder einfache Custom Properties) – aber das ist optional.</li>
+    <li>Tailwind wird als Vite-Plugin eingebunden – die CSS-Direktive <code>@import "tailwindcss"</code> in <code>src/index.css</code> aktiviert alle Utility-Klassen global.</li>
+    <li>Mit Tailwind entfällt das Schreiben von eigenem CSS für Layout und Abstände – alles über Klassen wie <code>flex</code>, <code>gap-4</code>, <code>p-6</code>.</li>
   </ul>
 </div>
 
@@ -228,6 +241,7 @@ export default defineConfig({
   <h2>✅ Akzeptanzkriterien</h2>
   <ul class="checklist">
     <li><code>npm run dev</code> startet ohne Fehler</li>
+    <li>Tailwind CSS ist installiert und aktiviert (Utility-Klassen wie <code>flex</code>, <code>text-blue-600</code> werden erkannt)</li>
     <li>Die Startseite zeigt "React Component Training" an</li>
     <li>Die About-Seite ist über die Navigation erreichbar</li>
     <li>Die Navbar hebt die aktive Seite farblich hervor</li>
