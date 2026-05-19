@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>02 — Gekaskadete Selects</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .demo-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .demo-box select {
+      font-size: 1.1rem;
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      min-width: 240px;
+      margin: 8px 0;
+    }
+    .demo-box select:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    .demo-output {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      padding: 12px;
+      border-radius: 6px;
+      background: var(--bg-code);
+      min-height: 48px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="01b-select-uncontrolled.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="02a-nested-controlled.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">02</div>
+  <h1>Gekaskadete Selects: Zwei abhängige Dropdowns</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel dieser Einführung</h2>
+  <p>Du baust zwei <code>&lt;select&gt;</code>-Dropdowns, die voneinander abhängen: Die Auswahl im ersten bestimmt, welche Optionen das zweite anzeigt. Probiere unten das fertige Verhalten aus.</p>
+</div>
+
+<div class="box">
+  <h2>🔍 Das Beispiel zum Ausprobieren</h2>
+  <p>Wähle zuerst eine Kategorie, dann ein Item aus dieser Kategorie.</p>
+</div>
+
+<div class="demo-box">
+  <div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;">
+    <div>
+      <label for="catSelect" style="display:block;font-weight:600;margin-bottom:8px;">Kategorie</label>
+      <select id="catSelect">
+        <option value="" disabled selected>Bitte wählen...</option>
+        <option value="Ordinary">Ordinary</option>
+        <option value="Compressed">Compressed</option>
+        <option value="Moon">Moon</option>
+        <option value="Compressed Moon">Compressed Moon</option>
+      </select>
+    </div>
+    <div>
+      <label for="itemSelect" style="display:block;font-weight:600;margin-bottom:8px;">Item</label>
+      <select id="itemSelect" disabled>
+        <option value="" disabled selected>Bitte wählen...</option>
+      </select>
+    </div>
+  </div>
+  <div class="demo-output" id="demoOutput"></div>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>📖 Was passiert hier?</summary>
+  <div class="body">
+    <p>Reines HTML + JavaScript mit einer Datenstruktur:</p>
+    <pre><code><span class="cm">// Datenquelle: Jeder Kategorie sind Items zugeordnet</span>
+var data = {
+    "Ordinary": ["Veldspar", "Scordite", "Pyroxeres", "Plagioclase"],
+    "Compressed": ["Compressed Veldspar", "Compressed Scordite"],
+    "Moon": ["Bitumens", "Carnotite", "Cobaltite"],
+    "Compressed Moon": ["Compressed Bitumens", "Compressed Carnotite"],
+};</code></pre>
+    <p><strong>Problem:</strong> In React manipulieren wir kein DOM direkt. Stattdessen:</p>
+    <ul>
+      <li>Dropdown 1 meldet die Auswahl per callback prop an die Parent-Komponente</li>
+      <li>Die Parent-Komponente filtert die Item-Liste und übergibt sie per <code>props</code> an Dropdown 2</li>
+      <li>React rendert Dropdown 2 automatisch neu</li>
+    </ul>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🧩 Übertragung nach React</summary>
+  <div class="body">
+    <p>Aus zwei HTML-Selects + JS-Event wird in React:</p>
+    <ul>
+      <li><strong>Zwei Child-Komponenten</strong>: <code>CategorySelect.tsx</code> und <code>ItemSelect.tsx</code></li>
+      <li><strong>Eine Parent-Komponente</strong> als "Controller", die den State hält und per <code>props</code> weitergibt</li>
+      <li><strong>Datenfluss</strong>: Kategorie-Auswahl → onChange → Parent filtert → props → Item-Select</li>
+    </ul>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Bevor du loslegst</h2>
+  <ul>
+    <li>Spiele mit der Demo – das ist das <strong>Soll-Verhalten</strong>.</li>
+    <li>Überlege: Wie kommst du von "zwei HTML-Selects + JS" zu "zwei React-Komponenten + Parent"?</li>
+    <li>Dann geht's weiter mit <a href="02a-nested-controlled.html">Aufgabe 02a (controlled)</a> oder <a href="02b-nested-uncontrolled.html">Aufgabe 02b (uncontrolled)</a>.</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="01b-select-uncontrolled.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="02a-nested-controlled.html">Nächste →</a>
+</div>
+
+</div>
+
+<script>
+  var data = {
+    "Ordinary": ["Veldspar", "Scordite", "Pyroxeres", "Plagioclase"],
+    "Compressed": ["Compressed Veldspar", "Compressed Scordite"],
+    "Moon": ["Bitumens", "Carnotite", "Cobaltite"],
+    "Compressed Moon": ["Compressed Bitumens", "Compressed Carnotite"],
+  };
+
+  var catSelect = document.getElementById('catSelect');
+  var itemSelect = document.getElementById('itemSelect');
+  var output = document.getElementById('demoOutput');
+
+  catSelect.addEventListener('change', function(e) {
+    var category = e.target.value;
+    var items = data[category] || [];
+    itemSelect.innerHTML = '<option value="" disabled selected>Bitte wählen...</option>';
+    items.forEach(function(item) {
+      var opt = document.createElement('option');
+      opt.value = item;
+      opt.textContent = item;
+      itemSelect.appendChild(opt);
+    });
+    itemSelect.disabled = items.length === 0;
+    itemSelect.value = '';
+    updateOutput();
+  });
+
+  itemSelect.addEventListener('change', updateOutput);
+
+  function updateOutput() {
+    var cat = catSelect.value;
+    var item = itemSelect.value;
+    if (cat && item) {
+      output.textContent = 'Auswahl: ' + cat + ' → ' + item;
+    } else if (cat) {
+      output.textContent = 'Kategorie: ' + cat + ' — wähle ein Item';
+    } else {
+      output.textContent = '';
+    }
+  }
+</script>
+
+</body>
+</html>

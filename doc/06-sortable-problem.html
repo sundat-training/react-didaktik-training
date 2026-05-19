@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>06 — Sortierbare Tabelle mit Filter</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .demo-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+    }
+    .demo-box table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .demo-box th {
+      background: var(--bg-code);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+    .demo-box th:hover { background: var(--accent-light); }
+    .demo-box td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .demo-box tfoot td {
+      font-weight: 600;
+      background: var(--bg-code);
+      border-top: 2px solid var(--border);
+    }
+    .row-buy { background: #d8f3dc; color: #2d6a4f; }
+    .row-sell { background: #ffe3e3; color: #c92a2a; }
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .filter-bar button {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .filter-bar button:hover { background: var(--accent-light); }
+    .filter-bar button.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .sort-indicator { margin-left: 4px; font-size: 0.7rem; }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="05-table-basic.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="06-table-sortable.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">06</div>
+  <h1>Sortierbare Tabelle: Klickbare Spalten + Filter</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel dieser Einführung</h2>
+  <p>Du erweiterst die Tabelle aus Aufgabe 05: Spaltenköpfe sind klickbar (Sortierung), und eine Button-Leiste filtert nach Buy/Sell/Alle – alles clientseitig, kein Server-Roundtrip.</p>
+</div>
+
+<div class="box">
+  <h2>🔍 Das Beispiel zum Ausprobieren</h2>
+  <p>Klicke auf einen Spaltenkopf zum Sortieren. Nutze die Filter-Buttons, um nur Buy oder Sell anzuzeigen.</p>
+</div>
+
+<div class="demo-box">
+  <div class="filter-bar" id="filterBar">
+    <button data-filter="all" class="active">Alle</button>
+    <button data-filter="Buy">Buy</button>
+    <button data-filter="Sell">Sell</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th data-col="type">Typ<span class="sort-indicator"></span></th>
+        <th data-col="loc">Ort<span class="sort-indicator"></span></th>
+        <th data-col="price">Preis<span class="sort-indicator"></span></th>
+        <th data-col="volume">Volumen<span class="sort-indicator"></span></th>
+      </tr>
+    </thead>
+    <tbody id="demoBody"></tbody>
+    <tfoot id="demoFoot"></tfoot>
+  </table>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>📖 Was passiert hier?</summary>
+  <div class="body">
+    <p>Klick auf Spaltenkopf → Sortierung. Klick auf Filter → nur passende Zeilen:</p>
+    <pre><code><span class="cm">// Sortierung: Klick auf th</span>
+th.addEventListener('click', function() {
+    var col = this.dataset.col;
+    <span class="cm">// toggle direction oder neue Spalte</span>
+    if (sortCol === col) sortAsc = !sortAsc;
+    else { sortCol = col; sortAsc = true; }
+    render();
+});
+
+<span class="cm">// Filter: Buttons togglen active</span>
+filterBar.addEventListener('click', function(e) {
+    if (e.target.dataset.filter) {
+        activeFilter = e.target.dataset.filter;
+        render();
+    }
+});</code></pre>
+    <p>In React: <code>Array.sort()</code> / <code>Array.filter()</code> statt DOM-Manipulation. State-Variablen für <code>sortKey</code>, <code>sortAsc</code>, <code>filter</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🧩 Übertragung nach React</summary>
+  <div class="body">
+    <ul>
+      <li><strong>Sort-Status</strong>: <code>sortKey: keyof Order</code> + <code>sortAsc: boolean</code></li>
+      <li><strong>Filter-Status</strong>: <code>filter: 'all' | 'buy' | 'sell'</code></li>
+      <li><strong>onClick</strong> auf <code>&lt;th&gt;</code> zum Sortieren</li>
+      <li><strong>Sortier-Indikator</strong>: <code>▲</code> / <code>▼</code> per Conditional Rendering</li>
+      <li><strong>Chain</strong>: <code>orders.filter(...).sort(...)</code></li>
+    </ul>
+  </div>
+</details>
+
+<div class="page-footer">
+  <a href="05-table-basic.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="06-table-sortable.html">Nächste →</a>
+</div>
+
+</div>
+
+<script>
+  var data = [
+    { type: 'Buy', loc: 'Jita', price: 45.20, volume: 1000 },
+    { type: 'Sell', loc: 'Amarr', price: 47.80, volume: 500 },
+    { type: 'Buy', loc: 'Dodixie', price: 44.90, volume: 2500 },
+    { type: 'Sell', loc: 'Jita', price: 48.10, volume: 750 },
+    { type: 'Buy', loc: 'Rens', price: 45.50, volume: 1200 },
+    { type: 'Sell', loc: 'Hek', price: 49.00, volume: 300 },
+  ];
+
+  var sortCol = 'type', sortAsc = true, activeFilter = 'all';
+
+  function render() {
+    var filtered = data.filter(function(o) {
+      return activeFilter === 'all' || o.type === activeFilter;
+    });
+
+    var sorted = filtered.slice().sort(function(a, b) {
+      var va = a[sortCol], vb = b[sortCol];
+      if (typeof va === 'string') va = va.toLowerCase();
+      if (typeof vb === 'string') vb = vb.toLowerCase();
+      if (va < vb) return sortAsc ? -1 : 1;
+      if (va > vb) return sortAsc ? 1 : -1;
+      return 0;
+    });
+
+    var tbody = document.getElementById('demoBody');
+    tbody.innerHTML = '';
+    sorted.forEach(function(o) {
+      var row = document.createElement('tr');
+      row.className = o.type === 'Buy' ? 'row-buy' : 'row-sell';
+      row.innerHTML = '<td>' + o.type + '</td><td>' + o.loc + '</td>'
+        + '<td>' + o.price.toFixed(2) + ' ISK</td>'
+        + '<td>' + o.volume.toLocaleString('de-DE') + '</td>';
+      tbody.appendChild(row);
+    });
+
+    document.getElementById('demoFoot').innerHTML =
+      '<tr><td colspan="4">Gefiltert: ' + sorted.length + ' / ' + data.length + ' Einträge</td></tr>';
+
+    document.querySelectorAll('.filter-bar button').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === activeFilter);
+    });
+
+    document.querySelectorAll('th .sort-indicator').forEach(function(s, i) {
+      var cols = ['type', 'loc', 'price', 'volume'];
+      s.textContent = cols[i] === sortCol ? (sortAsc ? ' ▲' : ' ▼') : '';
+    });
+  }
+
+  document.querySelectorAll('th').forEach(function(th) {
+    th.addEventListener('click', function() {
+      var col = this.dataset.col;
+      if (sortCol === col) sortAsc = !sortAsc;
+      else { sortCol = col; sortAsc = true; }
+      render();
+    });
+  });
+
+  document.getElementById('filterBar').addEventListener('click', function(e) {
+    if (e.target.dataset.filter) {
+      activeFilter = e.target.dataset.filter;
+      render();
+    }
+  });
+
+  render();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 04b — Gekoppelte Inputs als Controlled Component</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="04-dual-input.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="05-table-problem.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 04b</div>
+  <h1>Gekoppelte Inputs als <span class="hl">Controlled Component</span></h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du löst dieselbe Aufgabe wie in <strong>04</strong>, aber als wiederverwendbare Controlled Component mit Props. Die Komponente bekommt <code>value</code>, <code>onValueChange</code>, <code>min</code>, <code>max</code> und <code>step</code> von außen – keine interne State-Verwaltung.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code>&lt;input type="range"&gt;</code>
+    <code>&lt;input type="number"&gt;</code>
+    <code>Props</code>
+    <code>Callback</code>
+    <code>Controlled Component</code>
+    <code>Lifting State Up</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle <code>DualInput.tsx</code> als Controlled Component mit Props <code>value</code>, <code>onValueChange</code>, <code>min</code>, <code>max</code>, <code>step</code>.</li>
+    <li><span class="step">2.</span> Der State lebt im Parent – die Komponente ruft nur <code>onValueChange</code> auf.</li>
+    <li><span class="step">3.</span> Beide Inputs (Slider + Number) zeigen <code>value</code> an und feuern <code>onChange</code> mit dem neuen Wert.</li>
+    <li><span class="step">4.</span> Verwende <code>onChange</code> für beide Inputs – React rendered bei jedem <code>setState</code> im Parent.</li>
+    <li><span class="step">5.</span> Zeige den Wert in Prozent-Format (<code>"42,5 %"</code>) an.</li>
+  </ol>
+</div>
+
+<div class="box note">
+  <h2>📌 Der Unterschied zu 04</h2>
+  <p>In <strong>04</strong> hast du <code>useState</code> innerhalb der Komponente verwendet. Hier liegt der State im <strong>Parent</strong> – die Komponente ist ein reines Presentational-Component. Das macht sie testbarer und wiederverwendbarer.</p>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Der Kern der Lösung:</p>
+    <pre><code><span class="cm">// Props definieren:</span>
+interface DualInputProps {
+    value: number;
+    onValueChange: (val: number) =&gt; void;
+    min?: number;
+    max?: number;
+    step?: number;
+}
+
+<span class="cm">// Slider und Number – beide feuern denselben Callback:</span>
+&lt;input type="range"
+       value={value}
+       onChange={(e) =&gt; onValueChange(Number(e.target.value))}
+       min={min} max={max} step={step} /&gt;
+
+&lt;input type="number"
+       value={value}
+       onChange={(e) =&gt; {
+           const raw = e.target.value;
+           if (raw !== "") {
+               const parsed = parseFloat(raw);
+               if (!isNaN(parsed)) onValueChange(parsed);
+           }
+       }}
+       min={min} max={max} /&gt;
+
+<span class="cm">// Im Parent:</span>
+const [value, setValue] = useState(50);
+&lt;DualInput value={value} onValueChange={setValue} /&gt;</code></pre>
+    <p>💡 Der Parent steuert den Wert – die Komponente meldet nur Änderungen.</p>
+    <p>💡 Kein interner State, keine doppelte Wahrheit.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen:</p>
+    <pre><code><span class="cm">{/* DualInput.tsx */}</span>
+
+interface DualInputProps {
+    value: number;
+    onValueChange: (val: number) =&gt; void;
+    min?: number;
+    max?: number;
+    step?: number;
+}
+
+function DualInput({
+    value,
+    onValueChange,
+    min = 0,
+    max = 100,
+    step = 1
+}: DualInputProps) {
+    return (
+        &lt;div className="d-flex align-items-center gap-3"&gt;
+            &lt;input type="range"
+                   value={value}
+                   onChange={<span class="err">❌</span>}
+                   min={min} max={max} step={step} /&gt;
+
+            &lt;span className="fw-bold text-primary text-center"
+                  style={{ minWidth: 80 }}&gt;
+                {value.toFixed(1)} %
+            &lt;/span&gt;
+
+            &lt;input type="number"
+                   value={value}
+                   onChange={<span class="err">❌</span>}
+                   min={min} max={max} step={step} /&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) <code>(e) =&gt; onValueChange(Number(e.target.value))</code>. (2) Handler mit <code>parseFloat</code> und Prüfung auf <code>isNaN</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">{/* DualInput.tsx */}</span>
+
+interface DualInputProps {
+    value: number;
+    onValueChange: (val: number) =&gt; void;
+    min?: number;
+    max?: number;
+    step?: number;
+}
+
+function DualInput({
+    value,
+    onValueChange,
+    min = 0,
+    max = 100,
+    step = 0.5
+}: DualInputProps) {
+    const handleSliderChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+        onValueChange(Number(e.target.value));
+    };
+
+    const handleNumberChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+        const raw = e.target.value;
+        if (raw !== "") {
+            const parsed = parseFloat(raw);
+            if (!isNaN(parsed)) {
+                onValueChange(Math.round(parsed * 10) / 10);
+            }
+        }
+    };
+
+    return (
+        &lt;div className="d-flex align-items-center gap-3"&gt;
+            &lt;input type="range"
+                   className="form-range flex-grow-1"
+                   value={value}
+                   onChange={handleSliderChange}
+                   min={min} max={max} step={step} /&gt;
+
+            &lt;span className="fw-bold text-primary text-center"
+                  style={{ minWidth: 80 }}&gt;
+                {value.toFixed(1)} %
+            &lt;/span&gt;
+
+            &lt;input type="number"
+                   className="form-control"
+                   style={{ width: 100 }}
+                   value={value}
+                   onChange={handleNumberChange}
+                   min={min} max={max} step={step} /&gt;
+        &lt;/div&gt;
+    );
+}
+
+<span class="cm">// Verwendung im Parent:</span>
+function Parent() {
+    const [value, setValue] = useState(50);
+    return &lt;DualInput value={value} onValueChange={setValue} /&gt;;
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Da beide Inputs denselben <code>value</code> und denselben Callback nutzen, sind sie automatisch synchron.</li>
+    <li><code>onChange</code> beim Slider feuert bei jeder Bewegung – React bündelt die Updates effizient.</li>
+    <li>Der Callback <code>onValueChange</code> wird vom Parent bereitgestellt – <code>setValue</code> von <code>useState</code> reicht oft direkt.</li>
+    <li>Verwende <code>Math.round</code> für konsistente Dezimalstellen.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Slider und Number-Feld sind jederzeit synchron</li>
+    <li>Slider reagiert flüssig auf Ziehen</li>
+    <li>Number-Feld akzeptiert präzise Werteingabe</li>
+    <li>Die Anzeige zeigt den Wert in Prozent-Format</li>
+    <li>Value und Callback werden als Props übergeben – kein interner State</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="04-dual-input.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="05-table-problem.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

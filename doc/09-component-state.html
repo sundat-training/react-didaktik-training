@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 09 — Component State</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="09-state-problem.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="09b-state-controlled.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 09</div>
+  <h1>Component State &amp; Kommunikation</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du kombinierst alle bisherigen Komponenten zu einer funktionsfähigen Seite. Du lernst das "Controller"-Pattern: Eine Parent-Komponente hält den gesamten State (<code>useState</code>) und verteilt ihn per <code>Props</code> an Child-Komponenten. Änderungen in den Kindern werden per <code>Callback-Props</code> zurückgemeldet.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code class="tag-tsx">interface Props</code>
+    <code class="tag-react">callback props</code>
+    <code class="tag-react">Parent→Child Datenfluss</code>
+    <code class="tag-react">Lifting State Up</code>
+    <code class="tag-ts">Record&lt;K,V&gt;</code>
+    <code class="tag-tsx">Conditional Rendering</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle eine Seite <code>Calculator.tsx</code> – sie ist der "Controller". Sie hält mit <code>useState</code>: <code>selectedItem</code>, <code>quantity</code>, <code>fee</code>, <code>result</code>, <code>isLoading</code>, <code>errorMessage</code>.</li>
+    <li><span class="step">2.</span> Baue die Komponenten aus den vorherigen Aufgaben in die Seite ein:
+      <ul>
+        <li>Ein gekaskadetes Select (Aufgabe 02) für Kategorie + Item</li>
+        <li>Ein QuantityInput (Aufgabe 03) für die Menge</li>
+        <li>Ein DualInput (Aufgabe 04) für die Gebühr</li>
+        <li>Eine Tabelle (Aufgabe 05/06) für Ergebnisse</li>
+      </ul>
+    </li>
+    <li><span class="step">3.</span> Verdrahte die <code>Callback-Props</code> der Kinder mit Handler-Funktionen in <code>Calculator.tsx</code>.</li>
+    <li><span class="step">4.</span> Wenn Item, Menge und Gebühr gültig sind, berechne (oder rufe API auf) und setze <code>result</code>.</li>
+    <li><span class="step">5.</span> Zeige während der Berechnung einen Spinner (<code>isLoading</code>). Bei Fehler eine rote Meldung (<code>errorMessage</code>).</li>
+    <li><span class="step">6.</span> Der "Berechnen"-Button ist deaktiviert, solange nicht alle Eingaben gültig sind.</li>
+    <li><span class="step">7.</span> Sorge dafür, dass bei Änderung einer Eingabe das vorherige Ergebnis zurückgesetzt wird.</li>
+  </ol>
+</div>
+
+<div class="box" style="border-left:4px solid var(--accent);">
+  <h2>📋 Beispieldaten zum Kopieren</h2>
+  <pre><code><span class="cm">// Daten aus Aufgabe 02 (Kategorien + Items)</span>
+const data: Record&lt;string, string[]&gt; = {
+  "Ordinary": ["Veldspar", "Scordite", "Pyroxeres", "Plagioclase"],
+  "Compressed": ["Compressed Veldspar", "Compressed Scordite"],
+};
+
+<span class="cm">// State der Calculator-Seite</span>
+const [selectedCategory, setSelectedCategory] = useState("");
+const [selectedItem, setSelectedItem] = useState("");
+const [quantity, setQuantity] = useState(0);
+const [fee, setFee] = useState(2.5);
+const [result, setResult] = useState&lt;CalculationResult | null&gt;(null);
+const [isLoading, setIsLoading] = useState(false);
+const [errorMessage, setErrorMessage] = useState&lt;string | null&gt;(null);</code></pre>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine:</p>
+    <pre><code><span class="cm">// Controller-Seite – alle Child-Komponenten eingebettet:</span>
+&lt;CategorySelect onCategoryChanged={handleCategoryChanged} /&gt;
+&lt;ItemSelect items={currentItems} disabled={!selectedCategory}
+            onItemSelected={handleItemSelected} /&gt;
+&lt;QuantityInput onQuantityChanged={handleQuantityChanged}
+               disabled={selectedItem === null} /&gt;
+&lt;DualInput onValueChanged={handleFeeChanged} /&gt;
+
+&lt;button onClick={calculateAsync}
+        <span class="hl">disabled={!canCalculate}</span>&gt;
+    Berechnen
+&lt;/button&gt;
+
+<span class="cm">// Button ist deaktiviert, solange nicht alle Eingaben gültig:</span>
+const canCalculate = selectedItem && quantity &gt; 0 && fee &gt;= 0;
+
+<span class="cm">// Ergebnis zurücksetzen bei neuer Eingabe:</span>
+const handleItemSelected = (item: string) => {
+  setSelectedItem(item);
+  <span class="hl">setResult(null);</span> <span class="cm">// Altes Ergebnis löschen</span>
+};
+
+<span class="cm">// Async Calculation mit Loading-State:</span>
+const calculateAsync = async () => {
+  setIsLoading(true);
+  setErrorMessage(null);
+  try {
+    const res = await <span class="hl">someService.calculateAsync(...)</span>;
+    setResult(res);
+  } catch (ex) {
+    setErrorMessage(ex instanceof Error ? ex.message : "Fehler");
+  } finally {
+    setIsLoading(false);
+  }
+};</code></pre>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen:</p>
+    <pre><code><span class="cm">{/* Calculator.tsx */}</span>
+
+&lt;h3&gt;Calculator&lt;/h3&gt;
+
+&lt;div className="row"&gt;
+    &lt;div className="col-md-6"&gt;
+        &lt;CategorySelect onCategoryChanged={handleCategoryChanged} /&gt;
+        &lt;ItemSelect items={currentItems}
+                    disabled={!selectedCategory}
+                    onItemSelected={handleItemSelected}
+                    key={selectedCategory} /&gt;
+        &lt;QuantityInput onQuantityChanged={handleQuantityChanged}
+                       disabled={!selectedItem} /&gt;
+        &lt;DualInput onValueChanged={handleFeeChanged} /&gt;
+
+        &lt;button className="btn btn-primary w-100 mt-3"
+                onClick={calculateAsync}
+                disabled={<span class="err">❌</span>}&gt;
+            {isLoading ? "Berechne..." : "Berechnen"}
+        &lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;div className="col-md-6"&gt;
+        {isLoading && (
+            &lt;div className="text-center py-4"&gt;
+                &lt;span className="spinner-border"&gt;&lt;/span&gt;
+            &lt;/div&gt;
+        )}
+        {!isLoading && errorMessage && (
+            &lt;div className="alert alert-danger"&gt;{errorMessage}&lt;/div&gt;
+        )}
+        {!isLoading && !errorMessage && result && (
+            &lt;OrderTable title="Ergebnis" orders={result.orders} /&gt;
+        )}
+    &lt;/div&gt;
+&lt;/div&gt;
+
+const [selectedCategory, setSelectedCategory] = useState("");
+const [selectedItem, setSelectedItem] = useState("");
+const [currentItems, setCurrentItems] = useState&lt;string[]&gt;([]);
+const [quantity, setQuantity] = useState(0);
+const [fee, setFee] = useState(2.5);
+const [result, setResult] = useState&lt;CalculationResult | null&gt;(null);
+const [isLoading, setIsLoading] = useState(false);
+const [errorMessage, setErrorMessage] = useState&lt;string | null&gt;(null);
+
+const canCalculate = <span class="err">❌</span>; <span class="cm">// Bedingung</span>
+
+const handleCategoryChanged = (cat: string) => {
+  setSelectedCategory(cat);
+  setCurrentItems(data[cat] ?? []);
+  setSelectedItem("");
+  <span class="err">❌</span> <span class="cm">// Ergebnis zurücksetzen</span>
+};
+
+const handleItemSelected = (item: string) => {
+  setSelectedItem(item);
+  setResult(null);
+};
+
+const handleQuantityChanged = (val: number) => {
+  setQuantity(val);
+  setResult(null);
+};
+
+const handleFeeChanged = (val: number) => {
+  setFee(val);
+  setResult(null);
+};
+
+const calculateAsync = async () => {
+  <span class="err">❌</span> <span class="cm">// Loading, try/catch, Berechnung</span>
+};</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) <code>!canCalculate</code> oder <code>!selectedItem || quantity === 0</code>. (2) <code>setResult(null)</code>. (3) Komplette <code>calculateAsync</code>-Funktion mit try/catch, loading-State, API-Aufruf.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">// CalculationResult.ts</span>
+interface CalculationResult {
+  itemName: string;
+  quantity: number;
+  totalPrice: number;
+  fee: number;
+  netPrice: number;
+  orders: Order[];
+}</code></pre>
+    <pre><code><span class="cm">{/* Calculator.tsx */}</span>
+import { useState } from "react";
+
+function Calculator() {
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedItem, setSelectedItem] = useState("");
+  const [currentItems, setCurrentItems] = useState&lt;string[]&gt;([]);
+  const [quantity, setQuantity] = useState(0);
+  const [fee, setFee] = useState(2.5);
+  const [result, setResult] = useState&lt;CalculationResult | null&gt;(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState&lt;string | null&gt;(null);
+
+  const data: Record&lt;string, string[]&gt; = {
+    "Ordinary": ["Veldspar", "Scordite", "Pyroxeres"],
+    "Compressed": ["Compressed Veldspar", "Compressed Scordite"],
+    "Moon": ["Bitumens", "Carnotite", "Cinnabar"],
+    "Compressed Moon": ["Compressed Bitumens", "Compressed Carnotite"],
+  };
+
+  const canCalculate = !!selectedItem && quantity > 0 && fee >= 0;
+
+  const handleCategoryChanged = (cat: string) => {
+    setSelectedCategory(cat);
+    setCurrentItems(data[cat] ?? []);
+    setSelectedItem("");
+    setResult(null);
+  };
+
+  const handleItemSelected = (item: string) => {
+    setSelectedItem(item);
+    setResult(null);
+  };
+
+  const handleQuantityChanged = (val: number) => {
+    setQuantity(val);
+    setResult(null);
+  };
+
+  const handleFeeChanged = (val: number) => {
+    setFee(val);
+    setResult(null);
+  };
+
+  const calculateAsync = async () => {
+    if (!canCalculate) return;
+
+    setIsLoading(true);
+    setErrorMessage(null);
+    setResult(null);
+
+    try {
+      <span class="cm">{/* Simulierte Berechnung (hier später echter API-Call) */}</span>
+      await new Promise(r =&gt; setTimeout(r, 500));
+      const total = quantity * 42.42;
+      const net = total * (1 - fee / 100);
+      setResult({
+        itemName: selectedItem,
+        quantity,
+        totalPrice: total,
+        fee,
+        netPrice: net,
+        orders: [],
+      });
+    } catch (ex) {
+      setErrorMessage(ex instanceof Error ? ex.message : "Fehler");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h3 className="mb-4"&gt;Ore Calculator&lt;/h3&gt;
+
+      &lt;div className="row"&gt;
+        &lt;div className="col-md-5"&gt;
+          &lt;div className="card shadow"&gt;
+            &lt;div className="card-body"&gt;
+              &lt;CategorySelect onCategoryChanged={handleCategoryChanged} /&gt;
+              &lt;ItemSelect items={currentItems}
+                          disabled={!selectedCategory}
+                          onItemSelected={handleItemSelected}
+                          key={selectedCategory} /&gt;
+              &lt;QuantityInput onQuantityChanged={handleQuantityChanged}
+                             disabled={!selectedItem} /&gt;
+              &lt;DualInput onValueChanged={handleFeeChanged} /&gt;
+
+              &lt;button className="btn btn-primary w-100 mt-3"
+                      onClick={calculateAsync}
+                      disabled={!canCalculate}&gt;
+                {isLoading ? "Berechne..." : "Berechnen"}
+              &lt;/button&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div className="col-md-7"&gt;
+          {isLoading && (
+            &lt;div className="text-center py-5"&gt;
+              &lt;span className="spinner-border text-primary"
+                    style={{ width: "3rem", height: "3rem" }}&gt;&lt;/span&gt;
+              &lt;p className="mt-2 text-muted"&gt;Berechne Preise...&lt;/p&gt;
+            &lt;/div&gt;
+          )}
+          {!isLoading && errorMessage && (
+            &lt;div className="alert alert-danger"&gt;
+              &lt;strong&gt;Fehler:&lt;/strong&gt; {errorMessage}
+            &lt;/div&gt;
+          )}
+          {!isLoading && !errorMessage && result && (
+            &lt;div className="card shadow"&gt;
+              &lt;div className="card-header fw-bold"&gt;
+                Ergebnis für {result.itemName} (x {result.quantity})
+              &lt;/div&gt;
+              &lt;div className="card-body"&gt;
+                &lt;table className="table mb-0"&gt;
+                  &lt;tbody&gt;
+                    &lt;tr&gt;&lt;td&gt;Gesamtpreis&lt;/td&gt;&lt;td className="text-end"&gt;{result.totalPrice.toFixed(2)} ISK&lt;/td&gt;&lt;/tr&gt;
+                    &lt;tr&gt;&lt;td&gt;Gebühr ({result.fee.toFixed(1)}%)&lt;/td&gt;&lt;td className="text-end text-danger"&gt;-{(result.totalPrice * result.fee / 100).toFixed(2)} ISK&lt;/td&gt;&lt;/tr&gt;
+                    &lt;tr className="fw-bold"&gt;&lt;td&gt;Netto&lt;/td&gt;&lt;td className="text-end"&gt;{result.netPrice.toFixed(2)} ISK&lt;/td&gt;&lt;/tr&gt;
+                  &lt;/tbody&gt;
+                &lt;/table&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          )}
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Die Controller-Seite ruft kein manuelles Re-Rendering auf (React macht das automatisch bei State-Änderungen).</li>
+    <li>Definiere ein Interface für das Ergebnis, das alle relevanten Felder bündelt.</li>
+    <li>Der <code>disabled</code>-Zustand des Berechnen-Buttons ergibt sich aus: Item != null && quantity > 0 && fee >= 0.</li>
+    <li>Nutze <code>key</code> auf Komponenten, um React bei State-Änderungen ein sauberes Re-Rendering zu ermöglichen.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Seite enthält: Item-Auswahl, Mengen-Eingabe, Gebühren-Eingabe, Ergebnis-Tabelle</li>
+    <li>Alle Child-Komponenten werden per Props gesteuert</li>
+    <li>Alle Child-Änderungen werden per Callback-Prop an die Parent gemeldet</li>
+    <li>Berechnen-Button ist deaktiviert bei ungültigen Eingaben</li>
+    <li>Spinner wird während der Berechnung angezeigt</li>
+    <li>Fehler werden als rote Meldung dargestellt</li>
+    <li>Bei Änderung einer Eingabe wird das vorherige Ergebnis zurückgesetzt</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="09-state-problem.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="09b-state-controlled.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

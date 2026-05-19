@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 01 — Problem: Select</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .demo-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .demo-box select {
+      font-size: 1.1rem;
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      min-width: 240px;
+    }
+    .demo-box select:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    .demo-output {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      padding: 12px;
+      border-radius: 6px;
+      background: var(--bg-code);
+      min-height: 48px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="00-setup.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="01a-select-controlled.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">01</div>
+  <h1>Select: Umsetzen einer simplen Select-Komponente</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel dieser Aufgabe</h2>
+  <p>Du baust eine React-Komponente mit einem <code>&lt;select&gt;</code>-Dropdown. Das klingt simpel – aber in React läuft Datenbindung anders als in reinem HTML/JS. Probiere unten das fertige Verhalten aus, dann setzt du es in React um.</p>
+</div>
+
+<div class="box">
+  <h2>🔍 Das Beispiel zum Ausprobieren</h2>
+  <p>Wähle eine Kategorie aus dem Dropdown. Die Auswahl wird sofort angezeigt – genau dieses Verhalten soll deine React-Komponente später haben.</p>
+</div>
+
+<div class="demo-box">
+  <label for="demoSelect" style="display:block;font-weight:600;margin-bottom:12px;">Kategorie wählen</label>
+  <select id="demoSelect">
+    <option value="" disabled selected>Bitte wählen...</option>
+    <option value="Ordinary">Ordinary</option>
+    <option value="Compressed">Compressed</option>
+    <option value="Moon">Moon</option>
+    <option value="Compressed Moon">Compressed Moon</option>
+  </select>
+  <div class="demo-output" id="demoOutput"></div>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>📖 Was passiert hier?</summary>
+  <div class="body">
+    <p>Reines HTML + JavaScript:</p>
+    <pre><code><span class="cm">&lt;!-- Das HTML --&gt;</span>
+&lt;select id="demoSelect"&gt;
+    &lt;option value="" disabled selected&gt;Bitte wählen...&lt;/option&gt;
+    &lt;option value="Ordinary"&gt;Ordinary&lt;/option&gt;
+    &lt;option value="Compressed"&gt;Compressed&lt;/option&gt;
+    &lt;option value="Moon"&gt;Moon&lt;/option&gt;
+    &lt;option value="Compressed Moon"&gt;Compressed Moon&lt;/option&gt;
+&lt;/select&gt;
+&lt;p id="demoOutput"&gt;&lt;/p&gt;
+
+<span class="cm">&lt;!-- Das JavaScript --&gt;</span>
+&lt;script&gt;
+document.getElementById('demoSelect')
+    .addEventListener('change', function(e) {
+        var output = document.getElementById('demoOutput');
+        output.textContent = e.target.value
+            ? 'Gewählt: ' + e.target.value
+            : '';
+    });
+&lt;/script&gt;</code></pre>
+    <p><strong>Problem:</strong> In React gibt es kein <code>document.getElementById</code> und kein direktes DOM-Manipulation. Du musst State und Events nutzen: <code>useState</code> + <code>onChange</code>. Das DOM wird von React für dich verwaltet.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🧩 Übertragung nach React</summary>
+  <div class="body">
+    <p>Aus dem HTML/JS wird in React:</p>
+    <ul>
+      <li><strong>HTML-Teil</strong> → bleibt fast gleich, nur <code>id</code> und JS-Events entfallen</li>
+      <li><strong><code>e.target.value</code></strong> → wird zu <code>useState</code> + <code>onChange</code></li>
+      <li><strong><code>textContent</code> setzen</strong> → wird zu einer <strong>State-Variable</strong>, die React automatisch rendert</li>
+      <li><strong>EventListener</strong> → wird zu <code>onChange</code> (controlled) oder <code>useRef</code> + <code>onChange</code> (uncontrolled)</li>
+    </ul>
+    <p>Das Ziel: Dieselbe Benutzererfahrung – aber ohne DOM-API, nur mit React State &amp; Props.</p>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Bevor du loslegst</h2>
+  <ul>
+    <li>Spiele mit dem Demo-Dropdown oben – das ist das <strong>Soll-Verhalten</strong>.</li>
+    <li>Überlege: Wie würdest du "Auswahl speichern und anzeigen" ohne DOM-API umsetzen?</li>
+    <li>Dann geht's weiter mit <a href="01a-select-controlled.html">Aufgabe 01a (controlled)</a> oder <a href="01b-select-uncontrolled.html">Aufgabe 01b (uncontrolled)</a>.</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="00-setup.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="01a-select-controlled.html">Nächste →</a>
+</div>
+
+</div>
+
+<script>
+  document.getElementById('demoSelect')
+    .addEventListener('change', function(e) {
+      var output = document.getElementById('demoOutput');
+      if (e.target.value) {
+        output.textContent = 'Gewählt: ' + e.target.value;
+      } else {
+        output.textContent = '';
+      }
+    });
+</script>
+
+</body>
+</html>

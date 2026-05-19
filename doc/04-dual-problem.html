@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04 — Gekoppelte Inputs</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .demo-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .demo-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .demo-box input[type="range"] {
+      width: 240px;
+      accent-color: var(--accent);
+    }
+    .demo-box input[type="number"] {
+      font-size: 1.1rem;
+      padding: 8px 12px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      width: 100px;
+      text-align: center;
+    }
+    .demo-box input[type="number"]:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    .demo-percent {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 80px;
+    }
+    .demo-output {
+      margin-top: 16px;
+      font-size: 1.1rem;
+      padding: 12px;
+      border-radius: 6px;
+      background: var(--bg-code);
+      min-height: 48px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="03b-input-controlled.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="04-dual-input.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">04</div>
+  <h1>Gekoppelte Inputs: Slider + Zahlenfeld synchron</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel dieser Einführung</h2>
+  <p>Du kombinierst einen Slider und ein Zahlenfeld, die denselben Wert steuern. Eine Änderung im Slider aktualisiert sofort das Zahlenfeld – und umgekehrt. Du lernst bidirektionale Synchronisation mit <code>useState</code>.</p>
+</div>
+
+<div class="box">
+  <h2>🔍 Das Beispiel zum Ausprobieren</h2>
+  <p>Bewege den Slider oder tippe eine Zahl ein – beide bleiben synchron.</p>
+</div>
+
+<div class="demo-box">
+  <div class="demo-row">
+    <input type="range" id="demoSlider" min="0" max="100" step="0.5" value="42">
+    <span class="demo-percent" id="demoPercent">42,0 %</span>
+    <input type="number" id="demoNumber" min="0" max="100" step="0.5" value="42">
+  </div>
+  <div class="demo-output" id="demoOutput">Wert: 42,0 %</div>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>📖 Was passiert hier?</summary>
+  <div class="body">
+    <p>Zwei Inputs, ein Wert – Synchronisation in beide Richtungen:</p>
+    <pre><code><span class="cm">// Slider → Number</span>
+slider.addEventListener('input', function() {
+    numberEl.value = this.value;       <span class="cm">// Number aktualisieren</span>
+    updateDisplay(this.value);
+});
+
+<span class="cm">// Number → Slider</span>
+numberEl.addEventListener('change', function() {
+    var val = parseFloat(this.value);
+    if (!isNaN(val) && val >= 0 && val <= 100) {
+        sliderEl.value = val;           <span class="cm">// Slider aktualisieren</span>
+        updateDisplay(val);
+    }
+});</code></pre>
+    <p><strong>Problem:</strong> In React manipulieren wir keine DOM-Elemente direkt. Beide Inputs binden an <strong>dieselbe State-Variable</strong>. Ändert sich die Variable (egal durch welchen Input), rendert React beide neu.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🧩 Übertragung nach React</summary>
+  <div class="body">
+    <p>Aus zwei DOM-Elementen + JS wird in React:</p>
+    <ul>
+      <li><strong>Eine Komponente</strong> <code>DualInput</code> mit zwei Input-Feldern</li>
+      <li><strong>Eine State-Variable</strong> <code>const [value, setValue] = useState(50)</code> – beide Inputs lesen von ihr</li>
+      <li><strong>Zwei Handler</strong>: <code>handleSliderChange</code> und <code>handleNumberChange</code> – beide schreiben in <code>value</code></li>
+      <li><strong>Ein Callback</strong>: <code>onValueChange</code> als Prop</li>
+    </ul>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Bevor du loslegst</h2>
+  <ul>
+    <li>Probiere die Demo: Slider bewegen, dann Zahl eintippen – alles bleibt synchron.</li>
+    <li>Welchen Event-Typ nutzt du für den Slider (flüssig)? Welchen für das Number-Feld (präzise)?</li>
+    <li>Los geht's mit <a href="04-dual-input.html">Aufgabe 04</a>.</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="03b-input-controlled.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="04-dual-input.html">Nächste →</a>
+</div>
+
+</div>
+
+<script>
+  var sliderEl = document.getElementById('demoSlider');
+  var numberEl = document.getElementById('demoNumber');
+  var percentEl = document.getElementById('demoPercent');
+  var outputEl = document.getElementById('demoOutput');
+
+  function formatPercent(val) {
+    return parseFloat(val).toFixed(1).replace('.', ',') + ' %';
+  }
+
+  function updateDisplay(val) {
+    percentEl.textContent = formatPercent(val);
+    outputEl.textContent = 'Wert: ' + formatPercent(val);
+  }
+
+  sliderEl.addEventListener('input', function() {
+    numberEl.value = this.value;
+    updateDisplay(this.value);
+  });
+
+  numberEl.addEventListener('change', function() {
+    var val = parseFloat(this.value);
+    if (!isNaN(val) && val >= 0 && val <= 100) {
+      sliderEl.value = val;
+      updateDisplay(val);
+    } else {
+      this.value = sliderEl.value;
+    }
+  });
+</script>
+
+</body>
+</html>

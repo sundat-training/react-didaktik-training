@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 02b — Gekaskadete Selects uncontrolled</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="02a-nested-controlled.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="03-input-problem.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 02b</div>
+  <h1>Gekaskadete Selects <span class="hl">uncontrolled (useRef)</span></h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du löst dieselbe Aufgabe wie in <strong>02a</strong>, aber mit <code>useRef</code> statt <code>useState</code> in den Child-Komponenten – dem <strong>uncontrolled</strong>-Ansatz in React. Du siehst, wie <code>useRef</code> den Zugriff auf DOM-Werte ohne zusätzlichen State ermöglicht.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code class="tag-tsx">interface Props</code>
+    <code class="tag-react">useRef</code>
+    <code class="tag-react">onChange</code>
+    <code class="tag-react">Parent→Child Datenfluss</code>
+    <code class="tag-ts">Record&lt;K,V&gt;</code>
+    <code class="tag-react">Conditional Rendering</code>
+    <code class="tag-react">key</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle zwei Komponenten: <code>CategorySelect.tsx</code> (Kategorie-Auswahl) und <code>ItemSelect.tsx</code> (Item-Auswahl).</li>
+    <li><span class="step">2.</span> Beide Komponenten nutzen <code>useRef&lt;HTMLSelectElement&gt;</code> für den DOM-Zugriff.</li>
+    <li><span class="step">3.</span> <code>CategorySelect</code> gibt die gewählte Kategorie per Callback-Prop nach oben – ausgelesen via <code>ref.current.value</code>.</li>
+    <li><span class="step">4.</span> <code>ItemSelect</code> nimmt per <code>Props</code> eine Liste von Items entgegen und zeigt sie im Dropdown an.</li>
+    <li><span class="step">5.</span> Erstelle eine Parent-Seite, die beide Komponenten einbettet. Bei Kategorie-Wechsel wird die Item-Liste neu gesetzt.</li>
+    <li><span class="step">6.</span> Verwende ein <code>Record&lt;string, string[]&gt;</code> als Datenquelle.</li>
+    <li><span class="step">7.</span> Sorge dafür, dass bei Kategorie-Wechsel die Item-Auswahl zurückgesetzt wird.</li>
+  </ol>
+</div>
+
+<div class="box" style="border-left:4px solid var(--accent);">
+  <h2>📋 Beispieldaten zum Kopieren</h2>
+  <pre><code>const oreData: Record&lt;string, string[]&gt; = {
+  "Ordinary": ["Veldspar", "Scordite", "Pyroxeres", "Plagioclase"],
+  "Compressed": ["Compressed Veldspar", "Compressed Scordite", "Compressed Pyroxeres"],
+  "Moon": ["Bitumens", "Carnotite", "Cobaltite"],
+  "Compressed Moon": ["Compressed Bitumens", "Compressed Carnotite"],
+};</code></pre>
+</div>
+
+<div class="box note">
+  <h2>📌 Der Unterschied zu 02a</h2>
+  <p>In <strong>02a</strong> nutzen beide Childs <code>useState</code> + <code>onChange</code> + <code>value</code> – controlled components. Hier setzen beide auf <code>useRef</code> + <code>onChange</code> und lesen den Wert direkt aus dem DOM – weniger State, gleiche Schnittstelle nach außen.</p>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine:</p>
+    <pre><code><span class="cm">// CategorySelect mit useRef:</span>
+const selectRef = useRef&lt;HTMLSelectElement&gt;(null);
+
+const handleChange = () => {
+  const cat = selectRef.current?.value ?? "";
+  if (cat && onCategoryChanged) onCategoryChanged(cat);
+};
+
+&lt;select ref={selectRef} onChange={handleChange} defaultValue=""&gt;
+  ...
+&lt;/select&gt;
+
+<span class="cm">// ItemSelect mit useRef + disabled:</span>
+const selectRef = useRef&lt;HTMLSelectElement&gt;(null);
+
+const handleChange = () => {
+  const item = selectRef.current?.value ?? "";
+  if (item && onItemSelected) onItemSelected(item);
+};
+
+&lt;select ref={selectRef} onChange={handleChange}
+        defaultValue="" disabled={disabled}&gt;
+  ...
+&lt;/select&gt;
+
+<span class="cm">// Parent bleibt gleich:</span>
+&lt;CategorySelect onCategoryChanged={handleCategoryChanged} /&gt;
+&lt;ItemSelect items={currentItems} onItemSelected={handleItemSelected}
+            disabled={!selectedCategory}
+            key={selectedCategory} /&gt;</code></pre>
+    <p>💡 Die Callback-Schnittstelle ändert sich nicht – nur die interne Implementierung der Childs wird anders.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen in beiden Child-Komponenten:</p>
+    <pre><code><span class="cm">{/* CategorySelect.tsx */}</span>
+
+function CategorySelect({ onCategoryChanged }: CategorySelectProps) {
+  const selectRef = <span class="err">❌</span>;
+
+  const categories = ["Ordinary", "Compressed", "Moon", "Compressed Moon"];
+
+  const handleChange = () => {
+    const cat = <span class="err">❌</span>;
+    if (cat && onCategoryChanged) onCategoryChanged(cat);
+  };
+
+  return (
+    &lt;select className="form-select"
+            ref={selectRef} onChange={handleChange} defaultValue=""&gt;
+      &lt;option value="" disabled&gt;Bitte wählen...&lt;/option&gt;
+      {categories.map(cat =&gt; (
+        &lt;option key={cat} value={cat}&gt;{cat}&lt;/option&gt;
+      ))}
+    &lt;/select&gt;
+  );
+}</code></pre>
+    <pre><code><span class="cm">{/* ItemSelect.tsx */}</span>
+
+function ItemSelect({ items, disabled, onItemSelected }: ItemSelectProps) {
+  const selectRef = <span class="err">❌</span>;
+
+  const handleChange = () => {
+    const item = <span class="err">❌</span>;
+    if (item && onItemSelected) onItemSelected(item);
+  };
+
+  return (
+    &lt;select className="form-select"
+            ref={selectRef} onChange={handleChange}
+            defaultValue="" disabled={disabled}&gt;
+      &lt;option value="" disabled&gt;Bitte wählen...&lt;/option&gt;
+      {items.map(item =&gt; (
+        &lt;option key={item} value={item}&gt;{item}&lt;/option&gt;
+      ))}
+    &lt;/select&gt;
+  );
+}</code></pre>
+    <p>📌 <strong>Fehlend:</strong> Jeweils <code>useRef&lt;HTMLSelectElement&gt;(null)</code> und <code>selectRef.current?.value ?? ""</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">{/* CategorySelect.tsx */}</span>
+
+interface CategorySelectProps {
+  onCategoryChanged?: (category: string) => void;
+}
+
+function CategorySelect({ onCategoryChanged }: CategorySelectProps) {
+  const selectRef = useRef&lt;HTMLSelectElement&gt;(null);
+
+  const categories = ["Ordinary", "Compressed", "Moon", "Compressed Moon"];
+
+  const handleChange = () => {
+    const cat = selectRef.current?.value ?? "";
+    if (cat && onCategoryChanged) onCategoryChanged(cat);
+  };
+
+  return (
+    &lt;div className="mb-3"&gt;
+      &lt;label className="form-label fw-bold"&gt;Kategorie&lt;/label&gt;
+      &lt;select className="form-select"
+              ref={selectRef}
+              onChange={handleChange}
+              defaultValue=""&gt;
+        &lt;option value="" disabled&gt;Bitte wählen...&lt;/option&gt;
+        {categories.map(cat =&gt; (
+          &lt;option key={cat} value={cat}&gt;{cat}&lt;/option&gt;
+        ))}
+      &lt;/select&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+    <pre><code><span class="cm">{/* ItemSelect.tsx */}</span>
+
+interface ItemSelectProps {
+  items: string[];
+  disabled?: boolean;
+  onItemSelected?: (item: string) => void;
+}
+
+function ItemSelect({ items, disabled, onItemSelected }: ItemSelectProps) {
+  const selectRef = useRef&lt;HTMLSelectElement&gt;(null);
+
+  const handleChange = () => {
+    const item = selectRef.current?.value ?? "";
+    if (item && onItemSelected) onItemSelected(item);
+  };
+
+  return (
+    &lt;div className="mb-3"&gt;
+      &lt;label className="form-label fw-bold"&gt;Item&lt;/label&gt;
+      &lt;select className="form-select"
+              ref={selectRef}
+              onChange={handleChange}
+              defaultValue=""
+              disabled={disabled}&gt;
+        &lt;option value="" disabled&gt;Bitte wählen...&lt;/option&gt;
+        {items.map(item =&gt; (
+          &lt;option key={item} value={item}&gt;{item}&lt;/option&gt;
+        ))}
+      &lt;/select&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+    <p><strong>Parent-Seite:</strong></p>
+    <pre><code><span class="cm">{/* CascadingSelectPage.tsx */}</span>
+
+function CascadingSelectPage() {
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedItem, setSelectedItem] = useState("");
+  const [currentItems, setCurrentItems] = useState&lt;string[]&gt;([]);
+
+  const oreData: Record&lt;string, string[]&gt; = {
+    "Ordinary": ["Veldspar", "Scordite", "Pyroxeres", "Plagioclase"],
+    "Compressed": ["Compressed Veldspar", "Compressed Scordite"],
+  };
+
+  const handleCategoryChanged = (category: string) => {
+    setSelectedCategory(category);
+    setCurrentItems(oreData[category] ?? []);
+    setSelectedItem("");
+  };
+
+  const handleItemSelected = (item: string) => {
+    setSelectedItem(item);
+    console.log(`Item: ${item}`);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;CategorySelect onCategoryChanged={handleCategoryChanged} /&gt;
+      &lt;ItemSelect items={currentItems}
+                  disabled={!selectedCategory}
+                  onItemSelected={handleItemSelected}
+                  key={selectedCategory} /&gt;
+      {selectedItem && (
+        &lt;p&gt;Auswahl: {selectedCategory} → {selectedItem}&lt;/p&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Die Parent-Komponente bleibt fast identisch zu 02a – nur die Childs werden mit <code>useRef</code> anders implementiert.</li>
+    <li>Bei <code>useRef</code> liest du den Wert erst bei Bedarf aus – es gibt kein <code>value</code>-Binding auf dem <code>&lt;select&gt;</code>.</li>
+    <li><code>key</code> auf <code>ItemSelect</code> sorgt dafür, dass React die Komponente bei Kategorie-Wechsel neu aufbaut und der interne Ref-Zustand zurückgesetzt wird.</li>
+    <li>Vergleiche die Code-Menge von CategorySelect in 02a vs. 02b.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Kategorie-Dropdown zeigt alle Kategorien an</li>
+    <li>Item-Dropdown zeigt nur Items der gewählten Kategorie</li>
+    <li>Bei Kategorie-Wechsel wird die Item-Auswahl zurückgesetzt</li>
+    <li>Item-Dropdown ist deaktiviert, solange keine Kategorie gewählt ist</li>
+    <li>Die Auswahl beider Dropdowns wird auf der Seite angezeigt</li>
+    <li>Beide Childs verwenden <code>useRef</code> – kein <code>useState</code> für den Wert</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="02a-nested-controlled.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="03-input-problem.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

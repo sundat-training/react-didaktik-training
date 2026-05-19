@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 08 — API-Integration mit fetch</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="08-api-problem.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="09-state-problem.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 08</div>
+  <h1>API-Integration mit <span class="hl">fetch</span></h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du rufst Daten von einer externen REST-API ab und stellst sie in der UI dar. Du lernst die Verwendung von <code>fetch</code> asynchronen API-Calls (<code>async</code>/<code>await</code>), die Verarbeitung von JSON-Responses und die drei UI-Zustände <strong>Loading</strong>, <strong>Error</strong>, <strong>Success</strong>.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code className="tag-react">useState</code>
+    <code className="tag-react">useEffect</code>
+    <code className="tag-ts">fetch()</code>
+    <code className="tag-ts">async/await</code>
+    <code>Conditional Rendering</code>
+    <code>try/catch</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle eine Komponente <code>TypeInfo.tsx</code>, die eine <code>typeId: number</code> als Prop erhält.</li>
+    <li><span class="step">2.</span> Nutze <code>useState</code> für drei Zustände: <code>status: "loading" | "error" | "success"</code>, <code>data</code>, <code>error</code>.</li>
+    <li><span class="step">3.</span> Rufe in <code>useEffect</code> die EVE Online ESI API auf: <code>https://esi.evetech.net/latest/universe/types/{typeId}/</code>.</li>
+    <li><span class="step">4.</span> Zeige einen Spinner während des Ladens, die Daten bei Erfolg und eine Fehlermeldung bei Fehler.</li>
+    <li><span class="step">5.</span> Fange HTTP-Fehler (z.B. 404) und Netzwerkfehler mit <code>try/catch</code> ab.</li>
+    <li><span class="step">6.</span> Bonus: Verwende <code>AbortController</code>, um den Request abzubrechen, wenn die Komponente unmounted wird.</li>
+  </ol>
+</div>
+
+<div class="box" style="border-left:4px solid var(--accent);">
+  <h2>📋 Beispieldaten zum Kopieren</h2>
+  <pre><code><span class="cm">// TypeScript-Datenmodell</span>
+interface TypeInfo {
+    type_id: number;
+    name: string;
+    description: string;
+}
+
+type Status = "loading" | "error" | "success";
+
+<span class="cm">// fetch-Aufruf (ESI API)</span>
+const response = await fetch(`https://esi.evetech.net/latest/universe/types/${typeId}/`);
+if (!response.ok) throw new Error(`HTTP ${response.status}`);
+const data: TypeInfo = await response.json();
+
+<span class="cm">// TypeInfo-Komponente (Grundstruktur)</span>
+function TypeInfo({ typeId }: { typeId: number }) {
+    const [status, setStatus] = useState&lt;Status&gt;("loading");
+    const [data, setData] = useState&lt;TypeInfo | null&gt;(null);
+    const [error, setError] = useState&lt;string | null&gt;(null);
+
+    useEffect(() =&gt; {
+        setStatus("loading");
+        fetch(`https://esi.evetech.net/latest/universe/types/${typeId}/`)
+            .then(res =&gt; {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(json =&gt; {
+                setData(json);
+                setStatus("success");
+            })
+            .catch(err =&gt; {
+                setError(err.message);
+                setStatus("error");
+            });
+    }, [typeId]);
+
+    if (status === "loading") return &lt;p&gt;Lade Daten...&lt;/p&gt;;
+    if (status === "error") return &lt;p style={{color:"red"}}&gt;Fehler: {error}&lt;/p&gt;;
+    return &lt;div&gt;&lt;h2&gt;{data?.name}&lt;/h2&gt;&lt;p&gt;{data?.description}&lt;/p&gt;&lt;/div&gt;;
+}</code></pre>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine:</p>
+    <pre><code><span class="cm">// fetch + JSON parsen:</span>
+const response = await <span class="hl">fetch(endpoint)</span>;
+if (!response.ok) throw new Error(`HTTP ${response.status}`);
+const data = <span class="hl">await response.json()</span>;
+
+<span class="cm">// Komponente mit 3 Zuständen:</span>
+{status === "loading" && (
+    &lt;div className="text-center py-4"&gt;
+        &lt;div className="spinner-border" role="status"&gt;&lt;/div&gt;
+        &lt;p className="text-muted"&gt;Lade Daten...&lt;/p&gt;
+    &lt;/div&gt;
+)}
+{status === "error" && (
+    &lt;div className="alert alert-danger"&gt;Fehler: {error}&lt;/div&gt;
+)}
+{status === "success" && data && (
+    &lt;TypeTable data={data} /&gt;
+)}
+
+<span class="cm">// useRef + AbortController für Cleanup:</span>
+useEffect(() =&gt; {
+    const abortController = new AbortController();
+    fetch(url, { signal: abortController.signal })
+        .then(...)
+        .catch(err =&gt; {
+            if (err.name !== "AbortError") { <span class="cm">/* Fehler behandeln */</span> }
+        });
+    return () =&gt; abortController.abort();
+}, [typeId]);</code></pre>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen:</p>
+    <pre><code><span class="cm">// TypeInfo.tsx</span>
+import { useState, useEffect } from "react";
+
+interface TypeInfo {
+    type_id: number;
+    name: string;
+    description: string;
+}
+
+type Status = "loading" | "error" | "success";
+
+export function TypeInfo({ typeId }: { typeId: number }) {
+    const [status, <span class="err">❌</span>] = useState&lt;Status&gt;("loading");
+    const [data, setData] = useState&lt;TypeInfo | null&gt;(null);
+    const [error, setError] = useState&lt;string | null&gt;(null);
+
+    useEffect(() =&gt; {
+        setStatus("loading");
+        const controller = new AbortController();
+
+        fetch(`https://esi.evetech.net/latest/universe/types/${typeId}/`, {
+            signal: controller.signal
+        })
+            .then(res =&gt; {
+                if (<span class="err">❌</span>) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(json =&gt; {
+                setData(json);
+                setStatus("success");
+            })
+            .catch(err =&gt; {
+                if (err.name === "AbortError") return;
+                setError(err.message);
+                <span class="err">❌</span> <span class="cm">// Status auf "error" setzen</span>
+            });
+
+        return () =&gt; <span class="err">❌</span> <span class="cm">// Request abbrechen</span>;
+    }, [typeId]);
+
+    if (status === "loading") return &lt;p&gt;Lade Daten...&lt;/p&gt;;
+    if (status === "error") return &lt;p style={{color:"red"}}&gt;Fehler: {error}&lt;/p&gt;;
+    return (
+        &lt;div&gt;
+            &lt;h2&gt;{data?.name}&lt;/h2&gt;
+            &lt;p&gt;{data?.description}&lt;/p&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) <code>setStatus</code>. (2) <code>!res.ok</code>. (3) <code>setStatus("error")</code>. (4) <code>controller.abort()</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">// TypeInfo.tsx</span>
+import { useState, useEffect } from "react";
+
+interface TypeInfo {
+    type_id: number;
+    name: string;
+    description: string;
+}
+
+type Status = "loading" | "error" | "success";
+
+export function TypeInfo({ typeId }: { typeId: number }) {
+    const [status, setStatus] = useState&lt;Status&gt;("loading");
+    const [data, setData] = useState&lt;TypeInfo | null&gt;(null);
+    const [error, setError] = useState&lt;string | null&gt;(null);
+
+    useEffect(() =&gt; {
+        setStatus("loading");
+        const controller = new AbortController();
+
+        fetch(`https://esi.evetech.net/latest/universe/types/${typeId}/`, {
+            signal: controller.signal
+        })
+            .then(res =&gt; {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(json =&gt; {
+                setData(json);
+                setStatus("success");
+            })
+            .catch(err =&gt; {
+                if (err.name === "AbortError") return;
+                setError(err.message);
+                setStatus("error");
+            });
+
+        return () =&gt; controller.abort();
+    }, [typeId]);
+
+    if (status === "loading") return &lt;p&gt;Lade Daten...&lt;/p&gt;;
+    if (status === "error") return &lt;p style={{color:"red"}}&gt;Fehler: {error}&lt;/p&gt;;
+    return (
+        &lt;div&gt;
+            &lt;h2&gt;{data?.name}&lt;/h2&gt;
+            &lt;p&gt;{data?.description}&lt;/p&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Verwende <code>fetch</code> direkt – kein spezieller HTTP-Service nötig.</li>
+    <li>Prüfe <code>response.ok</code> nach dem fetch, da <code>fetch</code> nur bei Netzwerkfehlern in den catch geht.</li>
+    <li>Der <code>AbortController</code> verhindert Speicherleaks und "State update on unmounted component"-Warnungen.</li>
+    <li>Nutze <code>useEffect</code>-Dependency-Array <code>[typeId]</code>, damit bei Änderung der ID neu geladen wird.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>API-Daten werden asynchron geladen und angezeigt</li>
+    <li>Spinner wird während des Ladens angezeigt</li>
+    <li>Fehler werden abgefangen und als rote Meldung dargestellt</li>
+    <li>Der Request wird bei Unmount abgebrochen (AbortController)</li>
+    <li>useEffect hängt von typeId ab – bei Änderung wird neu geladen</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="08-api-problem.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="09-state-problem.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

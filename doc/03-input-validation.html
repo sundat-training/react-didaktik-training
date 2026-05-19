@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 03 — Input mit Validierung</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="03-input-problem.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="03b-input-controlled.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 03</div>
+  <h1>Input mit Validierung</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du erstellst ein numerisches Eingabefeld mit eigener Validierung. Du lernst, wie man Eingaben parst, Fehlerzustände verwaltet und sie benutzerfreundlich anzeigt – mit <code>useState</code> und Conditional Rendering.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code class="tag-html">&lt;input type="number"&gt;</code>
+    <code class="tag-react">useState</code>
+    <code class="tag-react">onChange</code>
+    <code class="tag-react">Conditional Rendering</code>
+    <code class="tag-ts">parseInt</code>
+    <code class="tag-css">CSS class toggling</code>
+    <code class="tag-tsx">Callback-Props</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle die Komponente <code>QuantityInput.tsx</code> mit einem <code>&lt;input type="number"&gt;</code>.</li>
+    <li><span class="step">2.</span> Bei jeder Eingabe (<code>onChange</code>) parst du den Wert mit <code>parseInt()</code>. Ist der Wert ungültig (keine Zahl, &le; 0), setzt du einen Error-String.</li>
+    <li><span class="step">3.</span> Zeige den Error-String als rote Meldung <strong>nur</strong> an, wenn ein Fehler vorliegt (Conditional Rendering mit <code>&&</code>).</li>
+    <li><span class="step">4.</span> Gib den gültigen Zahlenwert per Callback-Prop nach oben. Bei ungültiger Eingabe feuere kein Event.</li>
+    <li><span class="step">5.</span> Füge eine Prop <code>disabled?: boolean</code> hinzu. Wenn <code>true</code>, wird das Input-Feld deaktiviert.</li>
+    <li><span class="step">6.</span> Bonus: Füge Props <code>label?: string</code> und <code>minValue?: number</code> hinzu, um die Komponente allgemein nutzbar zu machen.</li>
+  </ol>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine:</p>
+    <pre><code><span class="cm">// onChange = feuert bei jeder Änderung:</span>
+&lt;input type="number"
+       <span class="hl">onChange={handleChange}</span>
+       value={inputValue}
+       disabled={disabled} /&gt;
+
+<span class="cm">// parseInt in React (e.target.value ist string):</span>
+const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
+    const raw = e.target.value;
+    const num = parseInt(raw, 10);
+    if (!isNaN(num) && num > 0) {
+        <span class="cm">// gültig</span>
+    } else {
+        <span class="cm">// Fehler setzen</span>
+    }
+};
+
+<span class="cm">// Conditional Rendering für Fehler:</span>
+{<span class="hl">errorMessage && (</span>
+    &lt;div style={{ color: "red" }}&gt;{errorMessage}&lt;/div&gt;
+)}
+
+<span class="cm">// Callback nur bei gültigem Wert feuern:</span>
+if (isValid)
+    <span class="hl">onQuantityChanged?.(num)</span>;</code></pre>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen:</p>
+    <pre><code><span class="cm">{/* QuantityInput.tsx */}</span>
+
+interface QuantityInputProps {
+  label?: string;
+  minValue?: number;
+  disabled?: boolean;
+  onQuantityChanged?: (value: number) => void;
+}
+
+function QuantityInput({ label = "Menge", minValue = 1, disabled, onQuantityChanged }: QuantityInputProps) {
+  const [inputValue, setInputValue] = useState("");
+  const [errorMessage, setErrorMessage] = useState&lt;string | null&gt;(null);
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
+    const raw = e.target.value;
+    setInputValue(raw);
+
+    if (raw.trim() === "") {
+      setErrorMessage("Feld darf nicht leer sein");
+      return;
+    }
+
+    const num = parseInt(raw, 10);
+    if (<span class="err">❌</span>) <span class="cm">// NaN-Prüfung fehlt</span>
+    {
+      setErrorMessage("Bitte eine gültige Zahl eingeben");
+      return;
+    }
+
+    if (num &lt; minValue) {
+      setErrorMessage(`Wert muss &gt;= ${minValue} sein`);
+      return;
+    }
+
+    setErrorMessage(null);
+    <span class="err">❌</span> <span class="cm">// Callback fehlt</span>
+  };
+
+  return (
+    &lt;div className="mb-3"&gt;
+      &lt;label className="form-label fw-bold"&gt;{label}&lt;/label&gt;
+      &lt;input type="number"
+             className={`form-control ${<span class="err">❌</span> ? "is-invalid" : ""}`}
+             onChange={handleChange}
+             value={inputValue}
+             disabled={disabled} /&gt;
+      {<span class="err">❌</span> && (
+        &lt;div className="text-danger small"&gt;{errorMessage}&lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) <code>isNaN(num)</code>-Prüfung. (2) <code>onQuantityChanged(num)</code>. (3) Bedingung für CSS-Klasse <code>is-invalid</code>. (4) Bedingung für Error-Rendering.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">{/* QuantityInput.tsx */}</span>
+
+interface QuantityInputProps {
+  label?: string;
+  minValue?: number;
+  disabled?: boolean;
+  onQuantityChanged?: (value: number) => void;
+}
+
+function QuantityInput({ label = "Menge", minValue = 1, disabled, onQuantityChanged }: QuantityInputProps) {
+  const [inputValue, setInputValue] = useState("");
+  const [errorMessage, setErrorMessage] = useState&lt;string | null&gt;(null);
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
+    const raw = e.target.value;
+    setInputValue(raw);
+
+    if (raw.trim() === "") {
+      setErrorMessage("Feld darf nicht leer sein");
+      return;
+    }
+
+    const num = parseInt(raw, 10);
+    if (isNaN(num)) {
+      setErrorMessage("Bitte eine gültige ganze Zahl eingeben");
+      return;
+    }
+
+    if (num &lt; minValue) {
+      setErrorMessage(`Wert muss &gt;= ${minValue} sein`);
+      return;
+    }
+
+    setErrorMessage(null);
+    onQuantityChanged?.(num);
+  };
+
+  return (
+    &lt;div className="mb-3"&gt;
+      &lt;label className="form-label fw-bold"&gt;{label}&lt;/label&gt;
+      &lt;input type="number"
+             className={`form-control ${errorMessage ? "is-invalid" : ""}`}
+             onChange={handleChange}
+             value={inputValue}
+             disabled={disabled}
+             min={minValue} /&gt;
+      {errorMessage && (
+        &lt;div className="text-danger small mt-1"&gt;{errorMessage}&lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+    <pre><code><span class="cm">{/* QuantityInput.module.css */}</span>
+.is-invalid {
+    border-color: #dc3545;
+}
+.is-invalid:focus {
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li><code>onChange</code> feuert bei jeder Änderung – perfekt für Live-Validierung.</li>
+    <li><code>e.target.value</code> ist immer ein <code>string</code>. Du musst selbst parsen.</li>
+    <li>Ein leeres Feld ist auch ein Sonderfall: Soll es erlaubt sein oder ein Fehler?</li>
+    <li>Zusätzlich zur Textmeldung: Füge eine CSS-Klasse <code>is-invalid</code> hinzu, die das Feld rot umrandet.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Akzeptiert nur positive ganze Zahlen &gt; 0</li>
+    <li>Zeigt eine rote Fehlermeldung bei leerem Feld, 0 oder negativen Werten</li>
+    <li>Blockiert die Weitergabe des Wertes bei ungültiger Eingabe</li>
+    <li>Das Feld kann von außen deaktiviert werden</li>
+    <li>Das Feld hat eine rote Umrandung bei Fehler (CSS-Klasse <code>.is-invalid</code>)</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="03-input-problem.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="03b-input-controlled.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

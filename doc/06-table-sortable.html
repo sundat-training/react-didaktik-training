@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 06 — Sortierbare Tabelle</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="06-sortable-problem.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="07-search-problem.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 06</div>
+  <h1>Sortierbare Tabelle mit Filter</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du erweiterst die Tabelle aus Aufgabe 05 um clientseitige Sortierung per Klick auf Spaltenköpfe und um einen Filter (z.B. Alle / Buy / Sell). Du lernst den Umgang mit <code>Array.sort()</code>, <code>Array.filter()</code> und der Sortierrichtung als Component-State.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code>Array.sort</code>
+    <code>Array.filter</code>
+    <code>keyof T</code>
+    <code>Sortier-Status</code>
+    <code>onClick</code> auf &lt;th&gt;</code>
+    <code>Unicode ▲▼</code>
+    <code>Conditional Rendering</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Kopiere die Komponente aus Aufgabe 05 und erweitere sie zu <code>SortableTable.tsx</code>.</li>
+    <li><span class="step">2.</span> Definiere einen Sortier-Status: <code>sortKey: keyof Order</code> (z.B. <code>"price"</code>, <code>"volume"</code>) und <code>sortAsc: boolean</code>.</li>
+    <li><span class="step">3.</span> Mache die <code>&lt;th&gt;</code>-Elemente klickbar. Bei Klick: Wechsel der Sortierrichtung bei gleicher Spalte, sonst neue Spalte aufsteigend.</li>
+    <li><span class="step">4.</span> Zeige einen Sortier-Indikator an: <code>" ▲"</code> oder <code>" ▼"</code> neben der aktiven Spalte.</li>
+    <li><span class="step">5.</span> Implementiere eine Filter-Button-Gruppe oberhalb der Tabelle: <code>Alle</code> | <code>Buy</code> | <code>Sell</code>.</li>
+    <li><span class="step">6.</span> Wende Filter <strong>vor</strong> der Sortierung an. Die ursprüngliche Props-Liste bleibt unverändert.</li>
+  </ol>
+</div>
+
+<div class="box" style="border-left:4px solid var(--accent);">
+  <h2>📋 Beispieldaten zum Kopieren</h2>
+  <pre><code><span class="cm">// Interface (identisch mit Aufgabe 05)</span>
+interface Order {
+    price: number;
+    volume: number;
+    isBuyOrder: boolean;
+    location: string;
+}
+
+<span class="cm">// Beispieldaten</span>
+const initialOrders: Order[] = [
+    { price: 45.20, volume: 1000, isBuyOrder: true,  location: "Jita" },
+    { price: 47.80, volume: 500,  isBuyOrder: false, location: "Amarr" },
+    { price: 44.90, volume: 2500, isBuyOrder: true,  location: "Dodixie" },
+    { price: 48.10, volume: 750,  isBuyOrder: false, location: "Jita" },
+    { price: 45.50, volume: 1200, isBuyOrder: true,  location: "Rens" },
+    { price: 49.00, volume: 300,  isBuyOrder: false, location: "Hek" },
+];
+
+<span class="cm">// Filter-Typ</span>
+type FilterType = "all" | "buy" | "sell";</code></pre>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine:</p>
+    <pre><code><span class="cm">// Sortier-Status:</span>
+const [sortKey, setSortKey] = useState&lt;keyof Order&gt;("price");
+const [sortAsc, setSortAsc] = useState(true);
+
+<span class="cm">// Klickbarer Spaltenkopf:</span>
+&lt;th <span class="hl">onClick={() =&gt; toggleSort("price")}</span> className="cursor-pointer"&gt;
+    Preis
+    {sortKey === "price" && (
+        &lt;span&gt;{sortAsc ? " ▲" : " ▼"}&lt;/span&gt;
+    )}
+&lt;/th&gt;
+
+<span class="cm">// Sortier-Logik:</span>
+const toggleSort = (key: keyof Order) =&gt; {
+    if (sortKey === key) {
+        setSortAsc(!sortAsc);
+    } else {
+        setSortKey(key);
+        setSortAsc(true);
+    }
+};
+
+<span class="cm">// Kombinierte Filter + Sortier-Liste:</span>
+const processed = [...orders]
+    .filter(o =&gt; filter === "all"
+        || (filter === "buy" && o.isBuyOrder)
+        || (filter === "sell" && !o.isBuyOrder))
+    .sort((a, b) =&gt; {
+        const aVal = a[sortKey];
+        const bVal = b[sortKey];
+        if (typeof aVal === "string") {
+            return sortAsc
+                ? aVal.localeCompare(bVal as string)
+                : (bVal as string).localeCompare(aVal);
+        }
+        return sortAsc
+            ? (aVal as number) - (bVal as number)
+            : (bVal as number) - (aVal as number);
+    });</code></pre>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen im Code:</p>
+    <pre><code>type FilterType = "all" | "buy" | "sell";
+
+function SortableTable() {
+    const [sortKey, setSortKey] = useState&lt;keyof Order&gt;("price");
+    const [sortAsc, setSortAsc] = useState(true);
+    const [filter, setFilter] = useState&lt;FilterType&gt;("all");
+
+    const toggleSort = (key: keyof Order) =&gt; {
+        if (sortKey === key) {
+            setSortAsc(<span class="err">❌</span>); <span class="cm">// umkehren</span>
+        } else {
+            setSortKey(key);
+            setSortAsc(<span class="err">❌</span>); <span class="cm">// neue Spalte immer aufsteigend</span>
+        }
+    };
+
+    const processed = [...initialOrders]
+        .filter(o =&gt; {
+            if (filter === "all") return true;
+            return filter === "buy" ? o.isBuyOrder : !o.isBuyOrder;
+        })
+        .sort((a, b) =&gt; {
+            const aVal = a[sortKey];
+            const bVal = b[sortKey];
+            if (typeof aVal === "string") {
+                return sortAsc
+                    ? aVal.localeCompare(bVal as string)
+                    : (bVal as string).localeCompare(aVal);
+            }
+            return sortAsc
+                ? (aVal as number) - (bVal as number)
+                : (bVal as number) - (aVal as number);
+        });
+
+    return (
+        &lt;div&gt;
+            &lt;div className="btn-group btn-group-sm mb-2"&gt;
+                &lt;button className={filter === "all" ? "btn btn-primary" : "btn btn-outline-primary"}
+                        onClick={() =&gt; <span class="err">❌</span>}&gt;Alle&lt;/button&gt;
+                &lt;button className={filter === "buy" ? "btn btn-success" : "btn btn-outline-success"}
+                        onClick={() =&gt; setFilter("buy")}&gt;Ankauf&lt;/button&gt;
+                &lt;button className={filter === "sell" ? "btn btn-danger" : "btn btn-outline-danger"}
+                        onClick={() =&gt; setFilter("sell")}&gt;Verkauf&lt;/button&gt;
+            &lt;/div&gt;
+
+            {processed.length === 0
+                ? &lt;p className="text-muted"&gt;Keine passenden Einträge&lt;/p&gt;
+                : (
+                    &lt;table&gt;
+                        &lt;thead&gt;
+                            &lt;tr&gt;
+                                &lt;th onClick={() =&gt; toggleSort("price")} role="button"&gt;
+                                    Preis {sortKey === "price" && (sortAsc ? "▲" : "▼")}&lt;/th&gt;
+                                ...
+                            &lt;/tr&gt;
+                        &lt;/thead&gt;
+                        &lt;tbody&gt;
+                            {processed.map(o =&gt; (
+                                &lt;tr key={o.location + o.price}
+                                    className={o.isBuyOrder ? "table-success" : "table-danger"}&gt;
+                                    ...
+                                &lt;/tr&gt;
+                            ))}
+                        &lt;/tbody&gt;
+                    &lt;/table&gt;
+                )}
+        &lt;/div&gt;
+    );
+}</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) <code>!sortAsc</code>. (2) <code>true</code>. (3) <code>setFilter("all")</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">{/* SortableTable.tsx */}</span>
+
+import { useState } from "react";
+
+interface Order {
+    price: number;
+    volume: number;
+    isBuyOrder: boolean;
+    location: string;
+}
+
+const initialOrders: Order[] = [
+    { price: 45.20, volume: 1000, isBuyOrder: true,  location: "Jita" },
+    { price: 47.80, volume: 500,  isBuyOrder: false, location: "Amarr" },
+    { price: 44.90, volume: 2500, isBuyOrder: true,  location: "Dodixie" },
+    { price: 48.10, volume: 750,  isBuyOrder: false, location: "Jita" },
+    { price: 45.50, volume: 1200, isBuyOrder: true,  location: "Rens" },
+    { price: 49.00, volume: 300,  isBuyOrder: false, location: "Hek" },
+];
+
+type FilterType = "all" | "buy" | "sell";
+
+function SortableTable() {
+    const [sortKey, setSortKey] = useState&lt;keyof Order&gt;("price");
+    const [sortAsc, setSortAsc] = useState(true);
+    const [filter, setFilter] = useState&lt;FilterType&gt;("all");
+
+    const toggleSort = (key: keyof Order) =&gt; {
+        if (sortKey === key) {
+            setSortAsc(!sortAsc);
+        } else {
+            setSortKey(key);
+            setSortAsc(true);
+        }
+    };
+
+    const getSortIcon = (key: keyof Order) =&gt; {
+        if (sortKey !== key) return "";
+        return sortAsc ? " ▲" : " ▼";
+    };
+
+    const processed = [...initialOrders]
+        .filter(o =&gt; {
+            if (filter === "all") return true;
+            return filter === "buy" ? o.isBuyOrder : !o.isBuyOrder;
+        })
+        .sort((a, b) =&gt; {
+            const aVal = a[sortKey];
+            const bVal = b[sortKey];
+            if (typeof aVal === "string") {
+                return sortAsc
+                    ? aVal.localeCompare(bVal as string)
+                    : (bVal as string).localeCompare(aVal);
+            }
+            return sortAsc
+                ? (aVal as number) - (bVal as number)
+                : (bVal as number) - (aVal as number);
+        });
+
+    return (
+        &lt;div className="card shadow"&gt;
+            &lt;div className="card-header d-flex justify-content-between align-items-center"&gt;
+                &lt;span className="fw-bold"&gt;Marktorder&lt;/span&gt;
+                &lt;div className="btn-group btn-group-sm"&gt;
+                    &lt;button className={filter === "all" ? "btn btn-primary" : "btn btn-outline-primary"}
+                            onClick={() =&gt; setFilter("all")}&gt;Alle&lt;/button&gt;
+                    &lt;button className={filter === "buy" ? "btn btn-success" : "btn btn-outline-success"}
+                            onClick={() =&gt; setFilter("buy")}&gt;Ankauf&lt;/button&gt;
+                    &lt;button className={filter === "sell" ? "btn btn-danger" : "btn btn-outline-danger"}
+                            onClick={() =&gt; setFilter("sell")}&gt;Verkauf&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+
+            &lt;div className="card-body"&gt;
+                {processed.length === 0 ? (
+                    &lt;p className="text-muted text-center py-2"&gt;Keine passenden Einträge&lt;/p&gt;
+                ) : (
+                    &lt;div className="table-responsive"&gt;
+                        &lt;table className="table table-hover mb-0"&gt;
+                            &lt;thead className="table-dark"&gt;
+                                &lt;tr&gt;
+                                    &lt;th onClick={() =&gt; toggleSort("price")} role="button"&gt;
+                                        Preis{getSortIcon("price")}&lt;/th&gt;
+                                    &lt;th onClick={() =&gt; toggleSort("volume")} role="button"&gt;
+                                        Volumen{getSortIcon("volume")}&lt;/th&gt;
+                                    &lt;th onClick={() =&gt; toggleSort("type")} role="button"&gt;
+                                        Typ{getSortIcon("type")}&lt;/th&gt;
+                                    &lt;th onClick={() =&gt; toggleSort("location")} role="button"&gt;
+                                        Station{getSortIcon("location")}&lt;/th&gt;
+                                &lt;/tr&gt;
+                            &lt;/thead&gt;
+                            &lt;tbody&gt;
+                                {processed.map(order =&gt; (
+                                    &lt;tr className={order.isBuyOrder ? "table-success" : "table-danger"}
+                                        key={order.location + order.price}&gt;
+                                        &lt;td className="text-end"&gt;{order.price.toFixed(2)}&lt;/td&gt;
+                                        &lt;td className="text-end"&gt;{order.volume.toLocaleString()}&lt;/td&gt;
+                                        &lt;td&gt;{order.isBuyOrder ? "Ankauf" : "Verkauf"}&lt;/td&gt;
+                                        &lt;td&gt;{order.location}&lt;/td&gt;
+                                    &lt;/tr&gt;
+                                ))}
+                            &lt;/tbody&gt;
+                        &lt;/table&gt;
+                    &lt;/div&gt;
+                )}
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Verwende <code>keyof Order</code> für typsichere Spaltennamen.</li>
+    <li>Sortiere mit <code>[...orders].sort()</code> – erst kopieren, dann sortieren, um das Original nicht zu mutieren.</li>
+    <li>Der aktive Filter-Button sollte optisch hervorgehoben sein (z.B. <code>btn-primary</code> vs <code>btn-outline-primary</code>).</li>
+    <li>Unicode-Dreiecke: <code>" ▲"</code> und <code>" ▼"</code>.</li>
+    <li>Filter zuerst, dann sortieren – die Chain lautet <code>filter().sort()</code>.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Klick auf Spaltenkopf sortiert die Tabelle (auf-/absteigend wechselnd)</li>
+    <li>Aktive Sortierspalte zeigt ▲ oder ▼ an</li>
+    <li>Filter-Buttons (Alle/Buy/Sell) filtern die Tabelle korrekt</li>
+    <li>Filter und Sortierung kombinieren: erst filtern, dann sortieren</li>
+    <li>Die ursprüngliche Props-Liste wird nicht verändert</li>
+    <li>Bei leerem Filterergebnis erscheint eine Hinweismeldung</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="06-sortable-problem.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="07-search-problem.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

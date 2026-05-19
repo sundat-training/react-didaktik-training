@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>07 — Live-Suche / Autocomplete</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .demo-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .search-wrap {
+      position: relative;
+      display: inline-block;
+      width: 320px;
+    }
+    .search-wrap input {
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 10px 16px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .search-wrap input:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 240px;
+      overflow-y: auto;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 0 0 6px 6px;
+      z-index: 1000;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+    .dropdown.visible { display: block; }
+    .dropdown button {
+      display: block;
+      width: 100%;
+      padding: 10px 16px;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .dropdown button:hover { background: var(--accent-light); }
+    .demo-output {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      padding: 12px;
+      border-radius: 6px;
+      background: var(--bg-code);
+      min-height: 48px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="06-table-sortable.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="07-live-search.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">07</div>
+  <h1>Live-Suche / Autocomplete</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel dieser Einführung</h2>
+  <p>Du baust ein Textfeld, das bei jeder Tastatureingabe eine Dropdown-Liste mit passenden Vorschlägen anzeigt – wie eine Autocomplete-Suche.</p>
+</div>
+
+<div class="box">
+  <h2>🔍 Das Beispiel zum Ausprobieren</h2>
+  <p>Tippe etwas ein (z.B. "veld" oder "scor"): Die Liste filtert live. Klick auf einen Vorschlag übernimmt ihn.</p>
+</div>
+
+<div class="demo-box">
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="Item suchen..." autocomplete="off">
+    <div class="dropdown" id="searchDropdown"></div>
+  </div>
+  <div class="demo-output" id="demoOutput">Warte auf Eingabe...</div>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>📖 Was passiert hier?</summary>
+  <div class="body">
+    <p>Bei jeder Tastatureingabe wird gefiltert:</p>
+    <pre><code><span class="cm">// Bei jedem Tastendruck</span>
+input.addEventListener('input', function() {
+    var query = this.value.toLowerCase();
+    var matches = items.filter(function(item) {
+        return item.toLowerCase().includes(query);
+    });
+    <span class="cm">// Treffer im Dropdown anzeigen</span>
+    renderDropdown(matches);
+});
+
+<span class="cm">// Klick auf Treffer:</span>
+dropdown.addEventListener('click', function(e) {
+    if (e.target.tagName === 'BUTTON') {
+        input.value = e.target.textContent;
+        dropdown.classList.remove('visible');
+        <span class="cm">// Wert übernehmen / callback feuern</span>
+    }
+});</code></pre>
+    <p><strong>Problem:</strong> In React filterst du nicht das DOM, sondern einen State. Das Dropdown wird per <code>{query && filtered.length > 0 && (...)}</code> ein- und ausgeblendet.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🧩 Übertragung nach React</summary>
+  <div class="body">
+    <ul>
+      <li><strong>Eingabe</strong>: <code>onChange</code> an <code>query</code> State</li>
+      <li><strong>Gefilterte Liste</strong>: <code>const filtered = allItems.filter(i => i.toLowerCase().includes(query.toLowerCase()))</code></li>
+      <li><strong>Dropdown</strong>: <code>position: absolute; z-index: 1000; max-height: 300px; overflow-y: auto</code></li>
+      <li><strong>Sichtbarkeit</strong>: <code>{query && filtered.length > 0 && (...)}</code></li>
+      <li><strong>Auswahl</strong>: <code>onClick</code> auf Item → Callback-Prop</li>
+    </ul>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Bevor du loslegst</h2>
+  <ul>
+    <li>Wie schließt du das Dropdown bei Klick außerhalb? (Tipp: useRef + useEffect mit Event Listener)</li>
+    <li>Wie verhinderst du, dass das Dropdown bei leerem Input angezeigt wird?</li>
+    <li>Los geht's mit <a href="07-live-search.html">Aufgabe 07</a>.</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="06-table-sortable.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="07-live-search.html">Nächste →</a>
+</div>
+
+</div>
+
+<script>
+  var items = [
+    "Veldspar", "Scordite", "Pyroxeres", "Plagioclase", "Omber",
+    "Kernite", "Jaspet", "Hemorphite", "Hedbergite", "Gneiss",
+    "Dark Ochre", "Spodumain", "Crokite", "Bistot", "Arkonor",
+    "Mercoxit", "Morphite", "Zydrine", "Megacyte", "Nocxium",
+    "Compressed Veldspar", "Compressed Scordite", "Compressed Pyroxeres",
+    "Compressed Omber", "Compressed Kernite", "Compressed Jaspet"
+  ];
+
+  var input = document.getElementById('searchInput');
+  var dropdown = document.getElementById('searchDropdown');
+  var output = document.getElementById('demoOutput');
+
+  input.addEventListener('input', function() {
+    var query = this.value.trim().toLowerCase();
+    var matches = query ? items.filter(function(i) {
+      return i.toLowerCase().includes(query);
+    }) : [];
+
+    if (matches.length > 0 && query.length > 0) {
+      dropdown.classList.add('visible');
+      dropdown.innerHTML = matches.map(function(m) {
+        return '<button type="button">' + m + '</button>';
+      }).join('');
+    } else {
+      dropdown.classList.remove('visible');
+    }
+
+    output.textContent = query ? (matches.length + ' Treffer') : 'Warte auf Eingabe...';
+  });
+
+  dropdown.addEventListener('click', function(e) {
+    if (e.target.tagName === 'BUTTON') {
+      var val = e.target.textContent;
+      input.value = val;
+      dropdown.classList.remove('visible');
+      output.textContent = 'Ausgewählt: ' + val;
+    }
+  });
+
+  input.addEventListener('blur', function() {
+    setTimeout(function() { dropdown.classList.remove('visible'); }, 200);
+  });
+
+  input.addEventListener('focus', function() {
+    if (this.value.trim()) {
+      this.dispatchEvent(new Event('input'));
+    }
+  });
+</script>
+
+</body>
+</html>

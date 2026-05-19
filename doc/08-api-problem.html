@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>08 — API-Integration mit fetch</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .demo-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .demo-box button {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 4px;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-danger:hover { filter: brightness(1.1); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .spinner {
+      display: inline-block;
+      width: 24px; height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 16px 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .demo-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.9rem;
+    }
+    .demo-table th {
+      background: var(--bg-code);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+    }
+    .demo-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .demo-error {
+      color: var(--red);
+      padding: 16px;
+      background: #ffe3e3;
+      border-radius: 6px;
+      margin-top: 12px;
+    }
+    .demo-empty {
+      color: var(--text-muted);
+      padding: 32px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="07b-search-controlled.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="08-api-fetch.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">08</div>
+  <h1>API-Integration: Daten von einer REST-API laden</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel dieser Einführung</h2>
+  <p>Du rufst Daten von einer externen REST-API ab und stellst sie in der UI dar – mit Ladezustand, Fehlerbehandlung und JSON-Parsing.</p>
+</div>
+
+<div class="box">
+  <h2>🔍 Das Beispiel zum Ausprobieren</h2>
+  <p>Klicke auf "Daten laden" (simulierter API-Call). Beobachte Loading-Spinner, Datenanzeige und Fehlerfall.</p>
+</div>
+
+<div class="demo-box">
+  <div>
+    <button class="btn-primary" id="btnLoad">Daten laden</button>
+    <button class="btn-danger" id="btnError">Fehler simulieren</button>
+  </div>
+  <div id="demoContent">
+    <div class="demo-empty">Noch keine Daten geladen.</div>
+  </div>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>📖 Was passiert hier?</summary>
+  <div class="body">
+    <p>Simulierter asynchroner API-Call mit <code>setTimeout</code>:</p>
+    <pre><code><span class="cm">// Simulierter API-Call</span>
+async function loadData(shouldFail) {
+    showLoading();                     <span class="cm">// Spinner anzeigen</span>
+    try {
+        var response = await fakeApi(shouldFail); <span class="cm">// setTimeout als Promise</span>
+        showData(response);            <span class="cm">// Daten rendern</span>
+    } catch (err) {
+        showError(err.message);        <span class="cm">// Fehler anzeigen</span>
+    }
+}
+
+<span class="cm">// In React wird daraus:</span>
+function TypeInfo() {
+    const [status, setStatus] = useState&lt;"loading" | "error" | "success"&gt;("idle");
+    const [data, setData] = useState(null);
+    const [error, setError] = useState(null);
+
+    useEffect(() =&gt; {
+        setStatus("loading");
+        fetch("https://api.example.com/data")
+            .then(res =&gt; res.json())
+            .then(json =&gt; { setData(json); setStatus("success"); })
+            .catch(err =&gt; { setError(err.message); setStatus("error"); });
+    }, []);
+}</code></pre>
+    <p><strong>Problem:</strong> In React gibt es kein DOM-Manipulation. <code>status</code>, <code>data</code> und <code>error</code> sind State-Variablen – React rendert automatisch die passende Ansicht.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🧩 Übertragung nach React</summary>
+  <div class="body">
+    <ul>
+      <li><strong>fetch()</strong>: Browser-API für HTTP-Requests – kein spezieller Service nötig</li>
+      <li><strong>Laden</strong>: <code>async/await</code> in <code>useEffect</code></li>
+      <li><strong>JSON parsen</strong>: <code>response.json()</code></li>
+      <li><strong>Paginierung</strong>: Mehrere Requests nacheinander oder parallel mit <code>Promise.all</code></li>
+      <li><strong>Drei UI-Zustände</strong>: <code>{status === "loading" && (...)}</code> / <code>{status === "error" && (...)}</code> / <code>{status === "success" && (...)}</code></li>
+    </ul>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Bevor du loslegst</h2>
+  <ul>
+    <li>Denk an die drei Zustände: Loading, Error, Success – jeder braucht eine eigene UI.</li>
+    <li>Wie fängst du Fehler bei API-Calls ab, ohne dass die App abstürzt?</li>
+    <li>Los geht's mit <a href="08-api-fetch.html">Aufgabe 08</a>.</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="07b-search-controlled.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="08-api-fetch.html">Nächste →</a>
+</div>
+
+</div>
+
+<script>
+  var fakeData = [
+    { id: 1, name: 'Veldspar', price: 45.20, volume: 1000000 },
+    { id: 2, name: 'Scordite', price: 32.80, volume: 800000 },
+    { id: 3, name: 'Pyroxeres', price: 55.00, volume: 500000 },
+    { id: 4, name: 'Plagioclase', price: 48.50, volume: 650000 },
+    { id: 5, name: 'Omber', price: 72.10, volume: 300000 },
+    { id: 6, name: 'Kernite', price: 88.40, volume: 200000 },
+  ];
+
+  var demoContent = document.getElementById('demoContent');
+  var btnLoad = document.getElementById('btnLoad');
+  var btnError = document.getElementById('btnError');
+  var loading = false;
+
+  function fakeApi(shouldFail) {
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        if (shouldFail) reject(new Error('API-Fehler: Server nicht erreichbar (HTTP 503)'));
+        else resolve(fakeData);
+      }, 1500);
+    });
+  }
+
+  function renderLoading() {
+    demoContent.innerHTML = '<div class="spinner"></div><p style="color:var(--text-muted)">Lade Daten...</p>';
+  }
+
+  function renderData(data) {
+    var html = '<table class="demo-table"><thead><tr><th>ID</th><th>Name</th><th>Preis</th><th>Volumen</th></tr></thead><tbody>';
+    data.forEach(function(item) {
+      html += '<tr><td>' + item.id + '</td><td>' + item.name + '</td><td>' + item.price.toFixed(2) + ' ISK</td><td>' + item.volume.toLocaleString('de-DE') + '</td></tr>';
+    });
+    html += '</tbody></table><p style="margin-top:8px;color:var(--text-muted);font-size:0.85rem">' + data.length + ' Einträge geladen</p>';
+    demoContent.innerHTML = html;
+  }
+
+  function renderError(msg) {
+    demoContent.innerHTML = '<div class="demo-error">❌ ' + msg + '</div>';
+  }
+
+  function loadData(shouldFail) {
+    if (loading) return;
+    loading = true;
+    btnLoad.disabled = true;
+    btnError.disabled = true;
+    renderLoading();
+
+    fakeApi(shouldFail).then(function(data) {
+      renderData(data);
+      loading = false;
+      btnLoad.disabled = false;
+      btnError.disabled = false;
+    }).catch(function(err) {
+      renderError(err.message);
+      loading = false;
+      btnLoad.disabled = false;
+      btnError.disabled = false;
+    });
+  }
+
+  btnLoad.addEventListener('click', function() { loadData(false); });
+  btnError.addEventListener('click', function() { loadData(true); });
+</script>
+
+</body>
+</html>

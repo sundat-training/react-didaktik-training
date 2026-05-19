@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10 — CSS-Techniken & Theme</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .demo-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .theme-toggle {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .theme-toggle button {
+      padding: 8px 20px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .theme-toggle button:hover { border-color: var(--accent); }
+    .theme-toggle button.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+    .theme-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: left;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .theme-card h3 { margin-bottom: 8px; }
+    .theme-card p { color: var(--text-muted); font-size: 0.9rem; }
+    .theme-card .tag-demo {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin: 4px;
+    }
+    .tag-primary { background: var(--accent); color: #fff; }
+    .tag-green { background: var(--green); color: #fff; }
+    .tag-orange { background: var(--orange); color: #fff; }
+    .responsive-demo {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .responsive-demo div {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 12px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .dark-theme-demo {
+      --bg-card: #25262b;
+      --border: #373a40;
+      --text: #e9ecef;
+      --text-muted: #868e96;
+      --accent: #5c7cfa;
+      --green: #69db7c;
+      --orange: #ffa94d;
+      --bg-code: #2c2e33;
+    }
+    [data-theme="dark"] .demo-box {
+      --bg-card: #25262b;
+      --border: #373a40;
+      --accent: #5c7cfa;
+      --bg-code: #2c2e33;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="09b-state-controlled.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="10-css-theme.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">10</div>
+  <h1>CSS-Techniken & Theme: Dark Mode, Scoped CSS, Responsive</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel dieser Einführung</h2>
+  <p>Du optimierst das visuelle Erscheinungsbild der Anwendung: CSS Modules, Dark/Light-Mode-Wechsel und responsive Layouts – ohne Framework, nur mit CSS-Variablen.</p>
+</div>
+
+<div class="box">
+  <h2>🔍 Das Beispiel zum Ausprobieren</h2>
+  <p>Wechsel zwischen Hell und Dunkel. Beobachte, wie CSS-Variablen alle Farben steuern.</p>
+</div>
+
+<div class="demo-box" id="demoBox">
+  <div class="theme-toggle">
+    <button data-theme="light" class="active" id="btnLight">☀️ Hell</button>
+    <button data-theme="dark" id="btnDark">🌙 Dunkel</button>
+  </div>
+  <div class="theme-card">
+    <h3>Beispiel-Komponente</h3>
+    <p>Diese Card passt sich dem Theme an – ohne Klassenwechsel, nur über CSS-Variablen.</p>
+    <div>
+      <span class="tag-demo tag-primary">Primary</span>
+      <span class="tag-demo tag-green">Success</span>
+      <span class="tag-demo tag-orange">Warning</span>
+    </div>
+    <div class="responsive-demo">
+      <div>Responsive</div>
+      <div>Grid</div>
+      <div>Passt</div>
+      <div>Sich</div>
+      <div>An</div>
+    </div>
+  </div>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>📖 Wie funktioniert das?</summary>
+  <div class="body">
+    <p>CSS-Variablen (Custom Properties) machen den Theme-Wechsel möglich:</p>
+    <pre><code><span class="cm">// Hell (Standard)</span>
+:root {
+    --bg-card: #f8f9fa;
+    --border: #dee2e6;
+    --text: #212529;
+    --accent: #4361ee;
+}
+
+<span class="cm">// Dunkel via Attribut-Selektor</span>
+[data-theme="dark"] {
+    --bg-card: #25262b;
+    --border: #373a40;
+    --text: #e9ecef;
+    --accent: #5c7cfa;
+}</code></pre>
+    <p>Ein JS-Click toggled <code>data-theme</code> aufs <code>&lt;html&gt;</code>-Element. Alle Elemente, die CSS-Variablen nutzen, wechseln sofort mit.</p>
+    <p><strong>In React:</strong> <code>useEffect</code> + DOM-Manipulation (<code>document.documentElement.setAttribute</code>) setzt <code>data-theme</code> und speichert die Präferenz in <code>localStorage</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🧩 CSS Modules in React</summary>
+  <div class="body">
+    <ul>
+      <li><strong>CSS Modules</strong>: <code>Button.module.css</code> – Styles gelten nur innerhalb dieser Komponente</li>
+      <li><strong>:global</strong>: Überschreibt die Modul-Grenze, um globale Styles zu setzen</li>
+      <li><strong>CSS-Variablen</strong>: Global in <code>:root</code> definiert, in Komponenten referenziert</li>
+      <li><strong>Dark Mode</strong>: <code>data-theme="dark"</code> auf <code>&lt;html&gt;</code> + andere Variablen-Werte</li>
+      <li><strong>localStorage</strong>: Präferenz speichern, damit sie beim nächsten Besuch erhalten bleibt</li>
+    </ul>
+  </div>
+</details>
+
+<div class="page-footer">
+  <a href="09b-state-controlled.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="10-css-theme.html">Nächste →</a>
+</div>
+
+</div>
+
+<script>
+  var demoBox = document.getElementById('demoBox');
+  var btnLight = document.getElementById('btnLight');
+  var btnDark = document.getElementById('btnDark');
+
+  function setTheme(theme) {
+    demoBox.dataset.theme = theme;
+    btnLight.classList.toggle('active', theme === 'light');
+    btnDark.classList.toggle('active', theme === 'dark');
+  }
+
+  btnLight.addEventListener('click', function() { setTheme('light'); });
+  btnDark.addEventListener('click', function() { setTheme('dark'); });
+</script>
+
+</body>
+</html>

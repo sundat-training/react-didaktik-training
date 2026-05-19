@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 01a — Controlled Select</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="01-select-problem.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="01b-select-uncontrolled.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 01a</div>
+  <h1>Controlled Select</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du erstellst eine Komponente mit einem <code>&lt;select&gt;</code>-Dropdown und steuerst es über <code>useState</code> + <code>onChange</code>. Jede Auswahl wird per Callback-Prop an die Parent-Komponente gemeldet.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code>&lt;select&gt;</code>
+    <code>&lt;option&gt;</code>
+    <code>onChange</code>
+    <code>ChangeEvent</code>
+    <code>map()</code>
+    <code>callback props</code>
+    <code>useState</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle eine neue React-Komponente <code>CategorySelector.tsx</code>.</li>
+    <li><span class="step">2.</span> Definiere ein festes Array von Kategorien als Konstante (z.B. <code>"Ordinary"</code>, <code>"Compressed"</code>, <code>"Moon"</code>, <code>"Compressed Moon"</code>).</li>
+    <li><span class="step">3.</span> Nutze <code>useState</code> für die aktuell gewählte Kategorie und baue ein <code>&lt;select&gt;</code> mit <code>value={selectedCategory}</code> und <code>onChange={handleChange}</code>.</li>
+    <li><span class="step">4.</span> Zeige die gewählte Kategorie unterhalb des Dropdowns an.</li>
+    <li><span class="step">5.</span> Gib die Auswahl per Callback-Prop (z.B. <code>onCategoryChange</code>) nach oben an die Parent-Komponente weiter.</li>
+  </ol>
+</div>
+
+<div class="box" style="border-left:4px solid var(--accent);">
+  <h2>📋 Beispieldaten zum Kopieren</h2>
+  <pre><code>const categories = ["Ordinary", "Compressed", "Moon", "Compressed Moon"];</code></pre>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine für diese Aufgabe:</p>
+    <pre><code><span class="cm">// Controlled Component mit onChange + useState:</span>
+interface CategorySelectorProps {
+  title?: string;
+  onCategoryChange?: (category: string) =&gt; void;
+}
+
+&lt;select value={selectedCategory} onChange={handleChange}&gt;
+    &lt;option value="" disabled&gt;Bitte wählen...&lt;/option&gt;
+    {categories.map(cat =&gt; (
+        &lt;option key={cat} value={cat}&gt;{cat}&lt;/option&gt;
+    ))}
+&lt;/select&gt;</code></pre>
+    <p>💡 <code>useState</code> gibt dir ein Tupel <code>[wert, setter]</code> – der Setter triggert ein Re-Render.</p>
+    <p>💡 <code>React.ChangeEvent&lt;HTMLSelectElement&gt;</code> liefert den neuen Wert über <code>e.target.value</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Props-Schnittstelle und Funktions-Signaturen – ergänze die fehlenden Teile (markiert mit <span class="err">❌</span>):</p>
+    <pre><code><span class="cm">// CategorySelector.tsx</span>
+
+interface CategorySelectorProps {
+  title?: string;
+  onCategoryChange?: (category: string) =&gt; void;
+}
+
+function CategorySelector({ title = "Kategorie wählen", onCategoryChange }: CategorySelectorProps) {
+  const [selectedCategory, <span class="err">❌</span>] = useState("");
+
+  const handleChange = (e: <span class="err">❌</span>) =&gt; {
+    const value = e.target.value;
+    setSelectedCategory(value);
+    if (value &amp;&amp; onCategoryChange) {
+      <span class="err">❌</span>
+    }
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;label&gt;{title}&lt;/label&gt;
+      &lt;select <span class="err">❌</span>={selectedCategory} <span class="err">❌</span>={handleChange}&gt;
+        <span class="cm">{/* ... */}</span>
+      &lt;/select&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+    <p>📌 <strong>Fehlende Teile:</strong> (1) <code>setSelectedCategory</code> als Setter. (2) Typ <code>React.ChangeEvent&lt;HTMLSelectElement&gt;</code>. (3) Callback-Aufruf <code>onCategoryChange(value)</code>. (4) <code>value</code> und <code>onChange</code> im &lt;select&gt;.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">// CategorySelector.tsx</span>
+
+const categories = ["Ordinary", "Compressed", "Moon", "Compressed Moon"];
+
+interface CategorySelectorProps {
+  title?: string;
+  onCategoryChange?: (category: string) =&gt; void;
+}
+
+function CategorySelector({ title = "Kategorie wählen", onCategoryChange }: CategorySelectorProps) {
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLSelectElement&gt;) =&gt; {
+    const value = e.target.value;
+    setSelectedCategory(value);
+    if (value &amp;&amp; onCategoryChange) {
+      onCategoryChange(value);
+    }
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;label&gt;{title}&lt;/label&gt;
+      &lt;select value={selectedCategory} onChange={handleChange}&gt;
+        &lt;option value="" disabled&gt;Bitte wählen...&lt;/option&gt;
+        {categories.map(cat =&gt; (
+          &lt;option key={cat} value={cat}&gt;{cat}&lt;/option&gt;
+        ))}
+      &lt;/select&gt;
+      {selectedCategory &amp;&amp; (
+        &lt;p&gt;Gewählt: &lt;strong&gt;{selectedCategory}&lt;/strong&gt;&lt;/p&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+    <pre><code><span class="cm">/* CategorySelector.module.css (CSS Modules) */</span>
+.select:focus {
+    border-color: #4361ee;
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+}</code></pre>
+    <p><strong>Verwendung in einer Parent-Seite:</strong></p>
+    <pre><code>&lt;CategorySelector
+    title="Erz-Kategorie"
+    onCategoryChange={(cat) =&gt; console.log(cat)}
+/&gt;</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Ein Platzhalter-Eintrag ("Bitte wählen...") braucht <code>value=""</code> und <code>disabled</code>.</li>
+    <li>Ein <strong>Controlled Component</strong> bedeutet: React steuert den Wert über <code>value</code> + <code>onChange</code> – der State ist die "Single Source of Truth".</li>
+    <li><code>useState</code> ist ein Hook – er muss immer auf der obersten Ebene der Funktion aufgerufen werden, nicht in Schleifen oder Bedingungen.</li>
+    <li>Der Callback wird nur bei gültiger Auswahl gefeuert (<code>value &amp;&amp; onCategoryChange</code>).</li>
+    <li>React rendert bei jeder State-Änderung neu – das ist erwünscht und kein Fehler.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Dropdown zeigt alle Kategorien als Optionen an</li>
+    <li>Platzhalter "Bitte wählen..." ist vorausgewählt</li>
+    <li>Die gewählte Kategorie wird unterhalb des Dropdowns angezeigt</li>
+    <li>Die Auswahl wird per Callback-Prop an die Parent-Komponente gemeldet</li>
+    <li>Bei leerer Auswahl (Platzhalter) wird kein Event gefeuert</li>
+    <li>Die Komponente hat eine <code>title</code>-Prop für die Beschriftung</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="01-select-problem.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="01b-select-uncontrolled.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09 — Component State & Kommunikation</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .demo-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+    }
+    .demo-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    .demo-field {
+      flex: 1;
+      min-width: 140px;
+    }
+    .demo-field label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .demo-field select, .demo-field input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .demo-field select:focus, .demo-field input:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    .demo-result {
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--bg-code);
+      border-radius: 6px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="08-api-fetch.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="09-component-state.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">09</div>
+  <h1>Component State: Alles zusammen – eine Seite, mehrere Komponenten</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel dieser Einführung</h2>
+  <p>Du kombinierst Selects, Inputs und Tabellen zu einer funktionsfähigen Seite. Eine zentrale "Controller"-Komponente orchestriert den State und verteilt Daten per <code>Props</code> an Kinder.</p>
+</div>
+
+<div class="box">
+  <h2>🔍 Das Beispiel zum Ausprobieren</h2>
+  <p>Wähle ein Item, gib Menge und Gebühr ein – der Gesamtwert wird berechnet. Alle Felder hängen zusammen und melden Änderungen an die Zentrale.</p>
+</div>
+
+<div class="demo-box">
+  <div class="demo-row">
+    <div class="demo-field">
+      <label>Item</label>
+      <select id="itemSelect">
+        <option value="" disabled selected>Bitte wählen...</option>
+        <option value="Veldspar" data-price="45.20">Veldspar (45,20 ISK)</option>
+        <option value="Scordite" data-price="32.80">Scordite (32,80 ISK)</option>
+        <option value="Pyroxeres" data-price="55.00">Pyroxeres (55,00 ISK)</option>
+        <option value="Omber" data-price="72.10">Omber (72,10 ISK)</option>
+      </select>
+    </div>
+    <div class="demo-field">
+      <label>Menge</label>
+      <input type="number" id="qtyInput" min="1" value="1000">
+    </div>
+    <div class="demo-field">
+      <label>Gebühr (%)</label>
+      <input type="number" id="feeInput" min="0" max="10" step="0.1" value="2.5">
+    </div>
+  </div>
+  <div class="demo-result" id="resultBox">Warte auf Eingabe...</div>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>📖 Was passiert hier?</summary>
+  <div class="body">
+    <p>Mehrere Eingabefelder → ein Ergebnis:</p>
+    <pre><code><span class="cm">// Jede Änderung triggert die Berechnung</span>
+function calculate() {
+    var price = parseFloat(selectedItem.dataset.price);
+    var qty = parseInt(qtyInput.value);
+    var fee = parseFloat(feeInput.value);
+    var total = price * qty * (1 + fee / 100);
+    showResult(total);
+}
+
+selectedItem.addEventListener('change', calculate);
+qtyInput.addEventListener('input', calculate);
+feeInput.addEventListener('input', calculate);</code></pre>
+    <p><strong>In React:</strong> Eine <strong>Parent-Komponente</strong> hält <code>selectedItem</code>, <code>quantity</code>, <code>fee</code>. Jede Child-Komponente meldet Änderungen per <code>Callback-Prop</code> – die Parent aktualisiert den State und React rendert neu.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🧩 Übertragung nach React</summary>
+  <div class="body">
+    <ul>
+      <li><strong>Controller-Komponente</strong>: <code>Calculator.tsx</code> hält den gesamten State mit <code>useState</code></li>
+      <li><strong>Kinder</strong>: CategorySelect, QuantityInput, DualInput, OrderTable – alle aus vorherigen Aufgaben</li>
+      <li><strong>Datenfluss</strong>: Child → Callback-Prop → Parent-State → Props → Child</li>
+      <li><strong>Formel</strong>: <code>result = itemPrice * quantity * (1 + fee / 100)</code></li>
+    </ul>
+  </div>
+</details>
+
+<div class="page-footer">
+  <a href="08-api-fetch.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="09-component-state.html">Nächste →</a>
+</div>
+
+</div>
+
+<script>
+  var itemSelect = document.getElementById('itemSelect');
+  var qtyInput = document.getElementById('qtyInput');
+  var feeInput = document.getElementById('feeInput');
+  var resultBox = document.getElementById('resultBox');
+
+  function calculate() {
+    var opt = itemSelect.options[itemSelect.selectedIndex];
+    if (!opt || !opt.dataset.price) {
+      resultBox.textContent = 'Bitte ein Item wählen';
+      return;
+    }
+    var price = parseFloat(opt.dataset.price);
+    var qty = parseInt(qtyInput.value) || 0;
+    var fee = parseFloat(feeInput.value) || 0;
+    var total = price * qty * (1 + fee / 100);
+    resultBox.textContent = 'Gesamtwert: ' + total.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ISK';
+  }
+
+  itemSelect.addEventListener('change', calculate);
+  qtyInput.addEventListener('input', calculate);
+  feeInput.addEventListener('input', calculate);
+</script>
+
+</body>
+</html>

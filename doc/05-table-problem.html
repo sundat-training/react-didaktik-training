@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>05 — Einfache Tabelle</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .demo-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+    }
+    .demo-box table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .demo-box th {
+      background: var(--bg-code);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+    }
+    .demo-box td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .demo-box tfoot td {
+      font-weight: 600;
+      background: var(--bg-code);
+      border-top: 2px solid var(--border);
+    }
+    .row-buy { background: #d8f3dc; color: #2d6a4f; }
+    .row-sell { background: #ffe3e3; color: #c92a2a; }
+    .tag-buy {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .tag-buy.buy { background: #d8f3dc; color: #2d6a4f; }
+    .tag-buy.sell { background: #ffe3e3; color: #c92a2a; }
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="04b-dual-controlled.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="05-table-basic.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">05</div>
+  <h1>Einfache Tabelle: Daten aus einer Liste anzeigen</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel dieser Einführung</h2>
+  <p>Du stellst eine Liste von Datenobjekten (Orders) in einer HTML-Tabelle dar – mit farblicher Kennzeichnung von Buy/Sell und einer Fußzeile mit Gesamtanzahl.</p>
+</div>
+
+<div class="box">
+  <h2>🔍 Das Beispiel zum Ausprobieren</h2>
+  <p>Eine statische Tabelle mit Orders: Buy-Zeilen sind grün, Sell-Zeilen rot. Unten steht die Gesamtanzahl.</p>
+</div>
+
+<div class="demo-box">
+  <table>
+    <thead>
+      <tr>
+        <th>Typ</th>
+        <th>Ort</th>
+        <th>Preis</th>
+        <th>Volumen</th>
+        <th>Gesamt</th>
+      </tr>
+    </thead>
+    <tbody id="demoBody">
+    </tbody>
+    <tfoot id="demoFoot">
+    </tfoot>
+  </table>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>📖 HTML-Struktur</summary>
+  <div class="body">
+    <p>Eine einfache HTML-Tabelle hat drei Teile:</p>
+    <pre><code>&lt;table&gt;
+    &lt;thead&gt;  &lt;!-- Spaltenköpfe --&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Typ&lt;/th&gt;
+            &lt;th&gt;Preis&lt;/th&gt;
+            ...
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;  &lt;!-- Datenzeilen — wird in React per map() befüllt --&gt;
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;  &lt;!-- Fußzeile mit Summen / Zählern --&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</code></pre>
+    <p><strong>Problem:</strong> In React baust du das <code>&lt;tbody&gt;</code> nicht manuell zusammen, sondern iterierst mit <code>map()</code> über ein <code>Props</code>-Array <code>orders</code>. Das <code>&lt;tfoot&gt;</code> zeigt dann <code>orders.length</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🧩 Übertragung nach React</summary>
+  <div class="body">
+    <ul>
+      <li><strong>Datenmodell</strong>: <code>Order</code> Interface mit price, volume, isBuyOrder, location</li>
+      <li><strong>Komponente</strong>: <code>OrderTable</code> mit <code>interface Props</code> und <code>orders: Order[]</code></li>
+      <li><strong>Farben</strong>: CSS-Klasse per <code>className</code> Ternary setzen</li>
+      <li><strong>Empty-State</strong>: <code>{orders.length === 0 && &lt;p&gt;...&lt;/p&gt;}</code></li>
+    </ul>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Bevor du loslegst</h2>
+  <ul>
+    <li>Überlege: Wie trennst du Daten (Model) von Darstellung (View)?</li>
+    <li>Wie würdest du Buy/Sell farblich unterscheiden, ohne JS?</li>
+    <li>Los geht's mit <a href="05-table-basic.html">Aufgabe 05</a>.</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="04b-dual-controlled.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="05-table-basic.html">Nächste →</a>
+</div>
+
+</div>
+
+<script>
+  var data = [
+    { type: 'Buy', loc: 'Jita', price: 45.20, volume: 1000 },
+    { type: 'Sell', loc: 'Amarr', price: 47.80, volume: 500 },
+    { type: 'Buy', loc: 'Dodixie', price: 44.90, volume: 2500 },
+    { type: 'Sell', loc: 'Jita', price: 48.10, volume: 750 },
+    { type: 'Buy', loc: 'Rens', price: 45.50, volume: 1200 },
+    { type: 'Sell', loc: 'Hek', price: 49.00, volume: 300 },
+  ];
+
+  var tbody = document.getElementById('demoBody');
+  var tfoot = document.getElementById('demoFoot');
+
+  data.forEach(function(o) {
+    var row = document.createElement('tr');
+    row.className = o.type === 'Buy' ? 'row-buy' : 'row-sell';
+    var total = (o.price * o.volume).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    row.innerHTML = '<td><span class="tag-buy ' + o.type.toLowerCase() + '">' + o.type + '</span></td>'
+      + '<td>' + o.loc + '</td>'
+      + '<td>' + o.price.toFixed(2) + ' ISK</td>'
+      + '<td>' + o.volume.toLocaleString('de-DE') + '</td>'
+      + '<td>' + total + ' ISK</td>';
+    tbody.appendChild(row);
+  });
+
+  tfoot.innerHTML = '<tr><td colspan="5">Gesamt: ' + data.length + ' Einträge</td></tr>';
+</script>
+
+</body>
+</html>

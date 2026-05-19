@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 03b — Input mit Validierung & controlled</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="03-input-validation.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="04-dual-problem.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 03b</div>
+  <h1>Input mit Validierung & <span class="hl">controlled</span></h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du löst dieselbe Aufgabe wie in <strong>03</strong>, aber mit einer klaren Trennung: Der Parent hält den Wert-State, die Child-Komponente ist ein reiner controlled Input mit Callback-Prop. Du siehst, wie der controlled-Ansatz die Datenhoheit beim Parent belässt.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code class="tag-tsx">interface Props</code>
+    <code class="tag-react">useState</code>
+    <code class="tag-react">onChange</code>
+    <code class="tag-react">Controlled Component</code>
+    <code class="tag-ts">parseInt</code>
+    <code class="tag-react">Conditional Rendering</code>
+    <code class="tag-tsx">Callback-Props</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle <code>QuantityInput.tsx</code> mit <code>&lt;input type="number"&gt;</code> als controlled Component.</li>
+    <li><span class="step">2.</span> Der Parent übergibt <code>value</code> und <code>onChange</code> – die Komponente hat keinen eigenen State für den Wert.</li>
+    <li><span class="step">3.</span> Validiere im <code>onChange</code>-Handler: parse mit <code>parseInt()</code>, setze Error-String bei Ungültigkeit.</li>
+    <li><span class="step">4.</span> Zeige den Error-String per Conditional Rendering.</li>
+    <li><span class="step">5.</span> Feuere die <code>onChange</code>-Callback nur bei gültigem Wert.</li>
+    <li><span class="step">6.</span> Füge <code>disabled?: boolean</code> und <code>minValue?: number</code> hinzu.</li>
+  </ol>
+</div>
+
+<div class="box note">
+  <h2>📌 Der Unterschied zu 03</h2>
+  <p>In <strong>03</strong> verwaltet die Input-Komponente ihren eigenen Wert-State. Hier wird der Wert vom Parent gesteuert (controlled). Die Komponente hat keinen <code>useState</code> mehr für <code>inputValue</code> – der Wert kommt von außen. Das macht die Komponente wiederverwendbarer, da der Parent die Datenhoheit behält.</p>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine:</p>
+    <pre><code><span class="cm">// Controlled Component: value + onChange von außen</span>
+interface QuantityInputProps {
+  value: string;
+  onChange?: (value: number) => void;
+  disabled?: boolean;
+  minValue?: number;
+}
+
+&lt;input type="number"
+       className={...}
+       onChange={handleChange}
+       <span class="hl">value={value}</span>
+       disabled={disabled} /&gt;
+
+<span class="cm">// Validierung + Callback im Handler:</span>
+const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
+  const raw = e.target.value;
+  const num = parseInt(raw, 10);
+
+  if (raw === "" || isNaN(num) || num &lt; minValue) {
+    setErrorMessage("...");
+    return;
+  }
+
+  setErrorMessage(null);
+  <span class="hl">onChange?.(num)</span>;
+};</code></pre>
+    <p>💡 Der Parent ruft die Komponente so auf:<br>
+    <code>&lt;QuantityInput value={qty} onChange={setQty} /&gt;</code></p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen:</p>
+    <pre><code><span class="cm">{/* QuantityInput.tsx */}</span>
+
+interface QuantityInputProps {
+  value: string;
+  onChange?: (value: number) => void;
+  disabled?: boolean;
+  minValue?: number;
+  label?: string;
+}
+
+function QuantityInput({ value, onChange, disabled, minValue = 1, label = "Menge" }: QuantityInputProps) {
+  const [errorMessage, setErrorMessage] = useState&lt;string | null&gt;(null);
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
+    const raw = e.target.value;
+    <span class="err">❌</span> <span class="cm">// Validierung + Callback</span>
+  };
+
+  return (
+    &lt;div className="mb-3"&gt;
+      &lt;label className="form-label fw-bold"&gt;{label}&lt;/label&gt;
+      &lt;input type="number"
+             className={`form-control ${<span class="err">❌</span> ? "is-invalid" : ""}`}
+             onChange={handleChange}
+             value={value}
+             disabled={disabled} /&gt;
+      {<span class="err">❌</span> && (
+        &lt;div className="text-danger small"&gt;{errorMessage}&lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) Validierungslogik in <code>handleChange</code>. (2) Bedingung für <code>is-invalid</code>. (3) Bedingung für Error-Rendering.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">{/* QuantityInput.tsx */}</span>
+
+interface QuantityInputProps {
+  value: string;
+  onChange?: (value: number) => void;
+  disabled?: boolean;
+  minValue?: number;
+  label?: string;
+}
+
+function QuantityInput({ value, onChange, disabled, minValue = 1, label = "Menge" }: QuantityInputProps) {
+  const [errorMessage, setErrorMessage] = useState&lt;string | null&gt;(null);
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
+    const raw = e.target.value;
+
+    if (raw.trim() === "") {
+      setErrorMessage("Feld darf nicht leer sein");
+      return;
+    }
+
+    const num = parseInt(raw, 10);
+    if (isNaN(num)) {
+      setErrorMessage("Bitte eine gültige ganze Zahl eingeben");
+      return;
+    }
+
+    if (num &lt; minValue) {
+      setErrorMessage(`Wert muss &gt;= ${minValue} sein`);
+      return;
+    }
+
+    setErrorMessage(null);
+    onChange?.(num);
+  };
+
+  return (
+    &lt;div className="mb-3"&gt;
+      &lt;label className="form-label fw-bold"&gt;{label}&lt;/label&gt;
+      &lt;input type="number"
+             className={`form-control ${errorMessage ? "is-invalid" : ""}`}
+             onChange={handleChange}
+             value={value}
+             disabled={disabled}
+             min={minValue} /&gt;
+      {errorMessage && (
+        &lt;div className="text-danger small mt-1"&gt;{errorMessage}&lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+    <pre><code><span class="cm">{/* QuantityInput.module.css */}</span>
+.is-invalid {
+    border-color: #dc3545;
+}
+.is-invalid:focus {
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}</code></pre>
+    <p><strong>Parent-Seite (Beispiel):</strong></p>
+    <pre><code>function OrderPage() {
+  const [qty, setQty] = useState("");
+
+  return (
+    &lt;div&gt;
+      &lt;QuantityInput
+        value={qty}
+        onChange={(num) => setQty(num.toString())}
+      /&gt;
+      {qty && &lt;p&gt;Bestellte Menge: {qty}&lt;/p&gt;}
+    &lt;/div&gt;
+  );
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Im Gegensatz zu 03 gibt es <strong>kein</strong> <code>useState</code> für den Wert in der Komponente – der Wert kommt vom Parent.</li>
+    <li>Der Error-String hingegen bleibt lokal in der Komponente – das ist sinnvoll, da der Parent nicht wissen muss, ob aktuell ein Fehler angezeigt wird.</li>
+    <li>Leeres Feld = Fehler. Entweder du blockierst es oder erlaubst es als "noch nichts eingegeben".</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Akzeptiert nur positive ganze Zahlen &gt; 0</li>
+    <li>Zeigt eine rote Fehlermeldung bei leerem Feld, 0 oder negativen Werten</li>
+    <li>Blockiert die Weitergabe des Wertes bei ungültiger Eingabe</li>
+    <li>Das Feld kann von außen deaktiviert werden</li>
+    <li>Der Wert wird vom Parent gesteuert (controlled component)</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="03-input-validation.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="04-dual-problem.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

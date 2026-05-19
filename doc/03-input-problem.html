@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>03 — Input mit Validierung</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .demo-box {
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .demo-box input {
+      font-size: 1.1rem;
+      padding: 10px 16px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      min-width: 200px;
+      text-align: center;
+      transition: border-color 0.15s;
+    }
+    .demo-box input:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    .demo-box input.error {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(214, 40, 40, 0.15);
+    }
+    .demo-error {
+      color: var(--red);
+      font-size: 0.9rem;
+      margin-top: 8px;
+      min-height: 24px;
+    }
+    .demo-output {
+      margin-top: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 12px;
+      border-radius: 6px;
+      background: var(--bg-code);
+      min-height: 48px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="02b-nested-uncontrolled.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="03-input-validation.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">03</div>
+  <h1>Input mit Validierung: Numerische Eingabe mit Fehleranzeige</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel dieser Einführung</h2>
+  <p>Du baust ein Eingabefeld, das nur gültige Zahlen akzeptiert. Bei ungültiger Eingabe erscheint eine Fehlermeldung – mit manuellem State und Conditional Rendering.</p>
+</div>
+
+<div class="box">
+  <h2>🔍 Das Beispiel zum Ausprobieren</h2>
+  <p>Gib eine Zahl ein (mindestens 1). Bei leerem Feld, Buchstaben oder Werten ≤ 0 erscheint ein Fehler.</p>
+</div>
+
+<div class="demo-box">
+  <label for="demoInput" style="display:block;font-weight:600;margin-bottom:12px;">Menge</label>
+  <input type="text" id="demoInput" placeholder="z.B. 42" autofocus>
+  <div class="demo-error" id="demoError"></div>
+  <div class="demo-output" id="demoOutput">Warte auf Eingabe...</div>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>📖 Was passiert hier?</summary>
+  <div class="body">
+    <p>Reines HTML + JavaScript:</p>
+    <pre><code><span class="cm">// Prüft bei jeder Eingabe</span>
+input.addEventListener('input', function() {
+    var raw = this.value.trim();
+    var parsed = parseInt(raw, 10);
+
+    if (raw === '' || isNaN(parsed) || parsed <= 0) {
+        <span class="cm">// Fehler anzeigen</span>
+        errorEl.textContent = 'Bitte gib eine positive ganze Zahl ein.';
+        inputEl.classList.add('error');
+        outputEl.textContent = '';
+    } else {
+        <span class="cm">// Gültig: Fehler aus</span>
+        errorEl.textContent = '';
+        inputEl.classList.remove('error');
+        outputEl.textContent = 'Gültig: ' + parsed;
+    }
+});</code></pre>
+    <p><strong>Problem:</strong> In React gibt es kein <code>classList.add</code> und kein direktes <code>textContent</code>. Du musst:</p>
+    <ul>
+      <li>Den Wert mit <code>useState</code> verwalten</li>
+      <li>Einen <strong>Error-String</strong> als State-Variable führen</li>
+      <li>Den Error-String per <code>&&</code> oder Ternary conditional rendern</li>
+      <li>Eine CSS-Klasse per Klammertoggeln setzen</li>
+    </ul>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🧩 Übertragung nach React</summary>
+  <div class="body">
+    <p>Aus dem JS-Code wird in React:</p>
+    <ul>
+      <li><strong><code>input.value</code></strong> → <code>value={value} onChange={...}</code> an einen <code>string</code>-State</li>
+      <li><strong><code>parseInt</code></strong> → <code>parseInt(raw, 10)</code> im Event-Handler</li>
+      <li><strong>CSS-Klasse togglen</strong> → <code>className={isValid ? "" : "error"}</code></li>
+      <li><strong>Fehlertext setzen</strong> → <code>setErrorMessage("...")</code> (React rendert automatisch)</li>
+      <li><strong>Callback feuern</strong> → nur bei gültigem Wert</li>
+    </ul>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Bevor du loslegst</h2>
+  <ul>
+    <li>Probiere die Demo: was passiert bei Buchstaben? Bei negativen Zahlen? Bei 0?</li>
+    <li>Überlege: Wie bildest du "CSS-Klasse togglen" in React ab?</li>
+    <li>Los geht's mit <a href="03-input-validation.html">Aufgabe 03</a>.</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="02b-nested-uncontrolled.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="03-input-validation.html">Nächste →</a>
+</div>
+
+</div>
+
+<script>
+  var inputEl = document.getElementById('demoInput');
+  var errorEl = document.getElementById('demoError');
+  var outputEl = document.getElementById('demoOutput');
+
+  inputEl.addEventListener('input', function() {
+    var raw = this.value.trim();
+    var parsed = parseInt(raw, 10);
+
+    if (raw === '' || isNaN(parsed) || parsed <= 0) {
+      errorEl.textContent = 'Bitte gib eine positive ganze Zahl ein.';
+      inputEl.classList.add('error');
+      outputEl.textContent = '❌ Ungültig';
+    } else {
+      errorEl.textContent = '';
+      inputEl.classList.remove('error');
+      outputEl.textContent = '✅ Gültig: ' + parsed;
+    }
+  });
+</script>
+
+</body>
+</html>

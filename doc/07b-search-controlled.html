@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 07b — Controlled Input / Props</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="07-live-search.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="08-api-problem.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 07b</div>
+  <h1>Live-Suche / Autocomplete als <span class="hl">Controlled Component</span></h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du löst dieselbe Aufgabe wie in <strong>07</strong>, aber als wiederverwendbare Komponente mit Props. Der Input wird von außen über <code>value</code> + <code>onChange</code> gesteuert (<strong>Controlled Component</strong>). Die Filterung läuft automatisch über einen <code>useEffect</code>-Hook.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code className="tag-react">useState</code>
+    <code className="tag-react">Props</code>
+    <code className="tag-tsx">onChange</code>
+    <code>Controlled Input</code>
+    <code>Callback-Prop</code>
+    <code>case-insensitive Filter</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle <code>SearchSelect.tsx</code> mit Props <code>items: SearchItem[]</code> und <code>onItemSelected?: (value: string) => void</code>.</li>
+    <li><span class="step">2.</span> Der Input ist ein <strong>Controlled Component</strong>: <code>value={searchText}</code> + <code>onChange={e => setSearchText(e.target.value)}</code>.</li>
+    <li><span class="step">3.</span> Ein <code>useEffect</code> filtert bei jeder Änderung von <code>searchText</code> die Items case-insensitive.</li>
+    <li><span class="step">4.</span> Zeige die Treffer als <code>&lt;button&gt;</code>-Liste im absolut positionierten Dropdown.</li>
+    <li><span class="step">5.</span> Klick auf ein Ergebnis setzt <code>searchText</code> und feuert <code>onItemSelected</code>.</li>
+  </ol>
+</div>
+
+<div class="box note">
+  <h2>📌 Der Unterschied zu 07</h2>
+  <p>In <strong>07</strong> filterst du manuell im <code>onChange</code>-Handler. Hier übernimmt <code>useEffect</code> die Filterung automatisch, sobald sich <code>searchText</code> ändert – getrennte Verantwortlichkeiten.</p>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Der Kern der Lösung:</p>
+    <pre><code><span class="cm">// Controlled Input + useEffect für Live-Filter:</span>
+&lt;input value={searchText}
+    onChange={e =&gt; setSearchText(e.target.value)}
+    placeholder="Suchen..." /&gt;
+
+{filtered.length &gt; 0 && (
+    &lt;div className="dropdown"&gt;
+        {filtered.map(item =&gt; (
+            &lt;button key={item.value}
+                onClick={() =&gt; selectItem(item)}&gt;
+                {item.displayName}
+            &lt;/button&gt;
+        ))}
+    &lt;/div&gt;
+)}
+
+function SearchSelect({ items, onItemSelected }: Props) {
+    const [searchText, setSearchText] = useState("");
+    const [filtered, setFiltered] = useState&lt;SearchItem[]&gt;([]);
+
+    useEffect(() =&gt; {
+        const q = searchText.toLowerCase();
+        setFiltered(
+            searchText
+                ? items.filter(i =&gt;
+                    i.displayName.toLowerCase().includes(q) ||
+                    i.value.toLowerCase().includes(q))
+                : []
+        );
+    }, [searchText, items]);
+
+    const selectItem = (item: SearchItem) =&gt; {
+        setSearchText(item.displayName);
+        setFiltered([]);
+        onItemSelected?.(item.value);
+    };
+
+    return ( ... );
+}</code></pre>
+    <p>💡 <code>useEffect</code> feuert nach jeder Änderung von <code>searchText</code> – perfekt für Live-Filter.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen:</p>
+    <pre><code><span class="cm">/* SearchSelect.tsx */</span>
+
+import { useState, useEffect } from "react";
+import type { SearchItem } from "./SearchItem";
+
+interface Props {
+    items: SearchItem[];
+    onItemSelected?: (value: string) =&gt; void;
+}
+
+export function SearchSelect({ items, onItemSelected }: Props) {
+    const [searchText, setSearchText] = useState("");
+    const [filtered, setFiltered] = useState&lt;SearchItem[]&gt;([]);
+
+    useEffect(() =&gt; {
+        const q = searchText.toLowerCase();
+        setFiltered(
+            searchText
+                ? items.filter(i =&gt;
+                    <span class="err">❌</span> <span class="cm">// Case-insensitive Filter</span>
+                )
+                : []
+        );
+    }, [searchText, items]);
+
+    const selectItem = (item: SearchItem) =&gt; {
+        <span class="err">❌</span> <span class="cm">// searchText setzen</span>
+        <span class="err">❌</span> <span class="cm">// filtered leeren</span>
+        <span class="err">❌</span> <span class="cm">// Callback feuern</span>
+    };
+
+    return (
+        &lt;div style={{ position: "relative" }}&gt;
+            &lt;input type="text"
+                value={searchText}
+                onChange={e =&gt; setSearchText(e.target.value)}
+                placeholder="Item suchen..." /&gt;
+
+            {filtered.length &gt; 0 && (
+                &lt;div className="dropdown-menu show" style={{
+                    position: "absolute", width: "100%",
+                    zIndex: 1000, maxHeight: 300, overflowY: "auto"
+                }}&gt;
+                    {filtered.map(item =&gt; (
+                        &lt;button className="dropdown-item"
+                            key={item.value}
+                            onClick={<span class="err">❌</span>}
+                            type="button"&gt;
+                            {item.displayName}
+                        &lt;/button&gt;
+                    ))}
+                &lt;/div&gt;
+            )}
+        &lt;/div&gt;
+    );
+}</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) <code>i.displayName.toLowerCase().includes(q) || i.value.toLowerCase().includes(q)</code>. (2) <code>setSearchText(item.displayName)</code>. (3) <code>setFiltered([])</code>. (4) <code>onItemSelected?.(item.value)</code>. (5) <code>() => selectItem(item)</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">/* SearchSelect.tsx */</span>
+
+import { useState, useEffect } from "react";
+import type { SearchItem } from "./SearchItem";
+
+interface Props {
+    items: SearchItem[];
+    onItemSelected?: (value: string) =&gt; void;
+}
+
+export function SearchSelect({ items, onItemSelected }: Props) {
+    const [searchText, setSearchText] = useState("");
+    const [filtered, setFiltered] = useState&lt;SearchItem[]&gt;([]);
+
+    useEffect(() =&gt; {
+        const q = searchText.toLowerCase();
+        setFiltered(
+            searchText
+                ? items.filter(i =&gt;
+                    i.displayName.toLowerCase().includes(q) ||
+                    i.value.toLowerCase().includes(q))
+                : []
+        );
+    }, [searchText, items]);
+
+    const selectItem = (item: SearchItem) =&gt; {
+        setSearchText(item.displayName);
+        setFiltered([]);
+        onItemSelected?.(item.value);
+    };
+
+    return (
+        &lt;div style={{ position: "relative" }}&gt;
+            &lt;input type="text"
+                value={searchText}
+                onChange={e =&gt; setSearchText(e.target.value)}
+                placeholder="Item suchen..." /&gt;
+
+            {filtered.length &gt; 0 && (
+                &lt;div className="dropdown-menu show" style={{
+                    position: "absolute", width: "100%",
+                    zIndex: 1000, maxHeight: 300, overflowY: "auto"
+                }}&gt;
+                    {filtered.map(item =&gt; (
+                        &lt;button className="dropdown-item"
+                            key={item.value}
+                            onClick={() =&gt; selectItem(item)}
+                            type="button"&gt;
+                            {item.displayName}
+                        &lt;/button&gt;
+                    ))}
+                &lt;/div&gt;
+            )}
+        &lt;/div&gt;
+    );
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Ein <strong>Controlled Component</strong> bekommt seinen Wert über <code>value</code> und aktualisiert ihn über <code>onChange</code> – React steuert den State.</li>
+    <li>Das Dropdown schließt sich, wenn <code>filtered</code> leer ist oder ein Item ausgewählt wurde.</li>
+    <li>Für Klick-außerhalb-schließen: Verwende <code>useRef</code> + <code>useEffect</code> mit <code>mousedown</code>-Event auf <code>document</code>.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Dropdown zeigt gefilterte Vorschläge während der Eingabe</li>
+    <li>Filter ist case-insensitive</li>
+    <li>Klick auf einen Vorschlag setzt den Input-Text und feuert Callback</li>
+    <li>Es wird <code>value</code> + <code>onChange</code> (Controlled Component) und <code>useEffect</code> für die Filterung verwendet</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="07-live-search.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="08-api-problem.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

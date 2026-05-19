@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 02a — Gekaskadete Selects controlled</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="02-nested-problem.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="02b-nested-uncontrolled.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 02a</div>
+  <h1>Gekaskadete Selects <span class="hl">controlled</span></h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du baust zwei <code>&lt;select&gt;</code>-Dropdowns, die voneinander abhängen: Die Auswahl im ersten Dropdown bestimmt, welche Optionen das zweite anzeigt. Du lernst, wie man <code>useState</code>, <code>Props</code> und Callback-Funktionen nutzt, um Daten zwischen Parent- und Child-Komponenten weiterzureichen.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code class="tag-tsx">interface Props</code>
+    <code class="tag-react">useState</code>
+    <code class="tag-react">onChange</code>
+    <code class="tag-react">Parent→Child Datenfluss</code>
+    <code class="tag-ts">Record&lt;K,V&gt;</code>
+    <code class="tag-react">Conditional Rendering</code>
+    <code class="tag-react">key</code>
+    <code class="tag-tsx">ChangeEvent</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle zwei Komponenten: <code>CategorySelect.tsx</code> (Kategorie-Auswahl) und <code>ItemSelect.tsx</code> (Item-Auswahl).</li>
+    <li><span class="step">2.</span> <code>CategorySelect</code> gibt die gewählte Kategorie per Callback-Prop nach oben.</li>
+    <li><span class="step">3.</span> <code>ItemSelect</code> nimmt per <code>Props</code> eine Liste von Items entgegen und zeigt sie im Dropdown an.</li>
+    <li><span class="step">4.</span> Erstelle eine Parent-Seite, die beide Komponenten einbettet. Bei Kategorie-Wechsel wird die Item-Liste neu gesetzt.</li>
+    <li><span class="step">5.</span> Verwende ein <code>Record&lt;string, string[]&gt;</code> als Datenquelle: Jeder Kategorie sind genau die Items zugeordnet, die in <code>ItemSelect</code> erscheinen.</li>
+    <li><span class="step">6.</span> Sorge dafür, dass bei Kategorie-Wechsel die Item-Auswahl zurückgesetzt wird.</li>
+  </ol>
+</div>
+
+<div class="box" style="border-left:4px solid var(--accent);">
+  <h2>📋 Beispieldaten zum Kopieren</h2>
+  <pre><code>const oreData: Record&lt;string, string[]&gt; = {
+  "Ordinary": ["Veldspar", "Scordite", "Pyroxeres", "Plagioclase"],
+  "Compressed": ["Compressed Veldspar", "Compressed Scordite", "Compressed Pyroxeres"],
+  "Moon": ["Bitumens", "Carnotite", "Cobaltite"],
+  "Compressed Moon": ["Compressed Bitumens", "Compressed Carnotite"],
+};</code></pre>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine:</p>
+    <pre><code><span class="cm">// Child-Komponente empfängt Daten:</span>
+interface ItemSelectProps {
+  items: string[];
+  disabled?: boolean;
+  onItemSelected?: (item: string) => void;
+}
+
+<span class="cm">// Parent gibt Daten weiter:</span>
+&lt;ItemSelect items={currentItems} /&gt;
+
+<span class="cm">// Record als Datenquelle:</span>
+const oreData: Record&lt;string, string[]&gt; = {
+  "Ordinary": ["Veldspar", "Scordite", "Pyroxeres"],
+  "Compressed": ["Compressed Veldspar"],
+};
+
+<span class="cm">// Bei Kategorie-Wechsel:</span>
+const handleCategoryChanged = (category: string) => {
+  setSelectedCategory(category);
+  setCurrentItems(oreData[category] ?? []);
+  <span class="hl">setSelectedItem("");</span> <span class="cm">// Reset!</span>
+};
+
+<span class="cm">// key für sauberes Re-Rendering:</span>
+&lt;ItemSelect items={currentItems} <span class="hl">key={selectedCategory}</span> /&gt;</code></pre>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Parent-Komponente: die "Controller"-Komponente. Ergänze die <span class="err">❌</span>-Stellen:</p>
+    <pre><code><span class="cm">{/* CascadingSelectPage.tsx (Parent) */}</span>
+
+&lt;CategorySelect onCategoryChanged={<span class="err">❌</span>} /&gt;
+&lt;ItemSelect items={currentItems} disabled={!selectedCategory}
+            onItemSelected={handleItemSelected} key={selectedCategory} /&gt;
+
+{selectedItem && (
+  &lt;p&gt;Auswahl: {selectedCategory} → {selectedItem}&lt;/p&gt;
+)}
+
+const [selectedCategory, setSelectedCategory] = useState("");
+const [selectedItem, setSelectedItem] = useState("");
+const [currentItems, setCurrentItems] = useState&lt;string[]&gt;([]);
+
+const oreData: Record&lt;string, string[]&gt; = {
+  "Ordinary": ["Veldspar", "Scordite", "Pyroxeres", "Plagioclase"],
+  "Compressed": ["Compressed Veldspar", "Compressed Scordite"],
+};
+
+const handleCategoryChanged = (category: string) => {
+  setSelectedCategory(category);
+  setCurrentItems(oreData[category] ?? []);
+  setSelectedItem("");  <span class="cm">// Reset Item-Auswahl</span>
+};
+
+const handleItemSelected = (item: string) => {
+  setSelectedItem(item);
+  <span class="err">❌</span> <span class="cm">// Fehlt: Log oder Weiterleitung</span>
+};</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) Callback-Verdrahtung in <code>handleCategoryChanged</code>. (2) Beliebige Aktion in <code>handleItemSelected</code> (z.B. <code>console.log</code>).</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">{/* CategorySelect.tsx (controlled) */}</span>
+
+interface CategorySelectProps {
+  onCategoryChanged?: (category: string) => void;
+}
+
+function CategorySelect({ onCategoryChanged }: CategorySelectProps) {
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const categories = ["Ordinary", "Compressed", "Moon", "Compressed Moon"];
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLSelectElement&gt;) => {
+    const cat = e.target.value;
+    setSelectedCategory(cat);
+    if (cat && onCategoryChanged) onCategoryChanged(cat);
+  };
+
+  return (
+    &lt;div className="mb-3"&gt;
+      &lt;label className="form-label fw-bold"&gt;Kategorie&lt;/label&gt;
+      &lt;select className="form-select"
+              onChange={handleChange}
+              value={selectedCategory}&gt;
+        &lt;option value="" disabled&gt;Bitte wählen...&lt;/option&gt;
+        {categories.map(cat =&gt; (
+          &lt;option key={cat} value={cat}&gt;{cat}&lt;/option&gt;
+        ))}
+      &lt;/select&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+    <pre><code><span class="cm">{/* ItemSelect.tsx (controlled) */}</span>
+
+interface ItemSelectProps {
+  items: string[];
+  disabled?: boolean;
+  onItemSelected?: (item: string) => void;
+}
+
+function ItemSelect({ items, disabled, onItemSelected }: ItemSelectProps) {
+  const [selectedItem, setSelectedItem] = useState("");
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLSelectElement&gt;) => {
+    const item = e.target.value;
+    setSelectedItem(item);
+    if (item && onItemSelected) onItemSelected(item);
+  };
+
+  return (
+    &lt;div className="mb-3"&gt;
+      &lt;label className="form-label fw-bold"&gt;Item&lt;/label&gt;
+      &lt;select className="form-select"
+              onChange={handleChange}
+              value={selectedItem}
+              disabled={disabled}&gt;
+        &lt;option value="" disabled&gt;Bitte wählen...&lt;/option&gt;
+        {items.map(item =&gt; (
+          &lt;option key={item} value={item}&gt;{item}&lt;/option&gt;
+        ))}
+      &lt;/select&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+    <p><strong>Parent-Seite:</strong> wie in Teil-Lösung, mit <code>handleCategoryChanged</code> und <code>handleItemSelected</code> vervollständigt.</p>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Die Parent-Komponente ist der "Controller": Sie hält den State und gibt ihn per Props an die Kinder weiter.</li>
+    <li>Setze <code>ItemSelect</code> auf <code>disabled</code>, solange keine Kategorie gewählt ist – das signalisiert dem Nutzer den Abhängigkeitsstatus.</li>
+    <li>Für das Zurücksetzen: übergib ein leeres Array oder setze den selektierten Wert auf <code>""</code>.</li>
+    <li>Verwende <code>key</code> auf <code>ItemSelect</code>, um React zu signalisieren, dass es bei Kategorie-Wechsel neu initialisieren soll.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Kategorie-Dropdown zeigt alle Kategorien an</li>
+    <li>Item-Dropdown zeigt nur Items der gewählten Kategorie</li>
+    <li>Bei Kategorie-Wechsel wird die Item-Auswahl zurückgesetzt</li>
+    <li>Item-Dropdown ist deaktiviert, solange keine Kategorie gewählt ist</li>
+    <li>Die Auswahl beider Dropdowns wird auf der Seite angezeigt</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="02-nested-problem.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="02b-nested-uncontrolled.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

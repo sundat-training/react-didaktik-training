@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 04 — Gekoppelte Inputs</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="04-dual-problem.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="04b-dual-controlled.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 04</div>
+  <h1>Gekoppelte Inputs (Slider + Number)</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du kombinierst zwei verschiedene Input-Typen – einen <code>&lt;input type="range"&gt;</code> (Slider) und ein <code>&lt;input type="number"&gt;</code> – die denselben Wert steuern. Änderung am einen aktualisiert sofort den anderen. Du lernst bidirektionale Synchronisation mit <code>useState</code> umzusetzen.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code>&lt;input type="range"&gt;</code>
+    <code>onChange</code>
+    <code>useState</code>
+    <code>Sync</code>
+    <code>Math.round</code>
+    <code>Props: min/max/step</code>
+    <code>onValueChange callback</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle <code>DualInput.tsx</code> mit einem Slider und einem Number-Input nebeneinander.</li>
+    <li><span class="step">2.</span> Beide Inputs binden an dieselbe <code>useState</code>-Variable. Änderung im Slider aktualisiert das Number-Feld und umgekehrt.</li>
+    <li><span class="step">3.</span> Verwende <code>onChange</code> für den Slider (flüssige Bewegung) und <code>onChange</code> für das Number-Feld (Präzisionseingabe).</li>
+    <li><span class="step">4.</span> Füge <code>Props</code> für <code>min</code>, <code>max</code> und <code>step</code> hinzu, damit die Komponente flexibel bleibt.</li>
+    <li><span class="step">5.</span> Gib den Wert per <code>onValueChange</code>-Callback nach oben.</li>
+    <li><span class="step">6.</span> Zeige den aktuellen Wert in Prozent-Format (<code>"42,5 %"</code>) zwischen den beiden Inputs an.</li>
+  </ol>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine:</p>
+    <pre><code><span class="cm">// Slider (range) mit onChange für Echtzeit:</span>
+&lt;input type="range"
+       <span class="hl">onChange={handleSliderChange}</span>
+       value={value}
+       min={min} max={max} step={step} /&gt;
+
+<span class="cm">// Number-Input mit onChange für Präzision:</span>
+&lt;input type="number"
+       <span class="hl">onChange={handleNumberChange}</span>
+       value={value}
+       min={min} max={max} /&gt;
+
+<span class="cm">// Wert-Anzeige:</span>
+&lt;span&gt;<span class="hl">{value.toFixed(1)} %</span>&lt;/span&gt;
+
+<span class="cm">// Bidirektionale Synchronisation:</span>
+const handleSliderChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    const newVal = Number(e.target.value);
+    <span class="hl">setValue(newVal);</span>
+};
+
+const handleNumberChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    const raw = e.target.value;
+    if (raw !== "") {
+        const parsed = parseFloat(raw);
+        if (!isNaN(parsed)) {
+            setValue(Math.round(parsed * 10) / 10);
+            <span class="hl">onValueChange?.(Math.round(parsed * 10) / 10);</span>
+        }
+    }
+};</code></pre>
+    <p>💡 <strong>Endlos-Schleifen vermeiden:</strong> Prüfe vor dem Callback, ob sich der Wert wirklich geändert hat.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen:</p>
+    <pre><code><span class="cm">{/* DualInput.tsx */}</span>
+
+interface DualInputProps {
+    min?: number;
+    max?: number;
+    step?: number;
+    <span class="err">❌</span> <span class="cm">// onValueChange callback</span>
+}
+
+function DualInput({ min = 0, max = 100, step = 1, onValueChange }: DualInputProps) {
+    const [value, setValue] = <span class="err">❌</span>; <span class="cm">// useState</span>
+
+    const handleSliderChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+        const newVal = Number(e.target.value);
+        setValue(newVal);
+        onValueChange?.(newVal);
+    };
+
+    const handleNumberChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+        const raw = e.target.value;
+        if (raw !== "") {
+            const val = parseFloat(raw);
+            if (!isNaN(val)) {
+                const rounded = Math.round(val * 10) / 10;
+                setValue(rounded);
+                <span class="err">❌</span> <span class="cm">// Callback aufrufen</span>
+            }
+        }
+    };
+
+    return (
+        &lt;div className="d-flex align-items-center gap-3"&gt;
+            &lt;input type="range"
+                   onChange={handleSliderChange}
+                   value={value}
+                   min={min} max={max} step={step} /&gt;
+
+            &lt;span className="fw-bold text-nowrap" style={{ minWidth: 80 }}&gt;
+                {value.toFixed(1)} %
+            &lt;/span&gt;
+
+            &lt;input type="number"
+                   onChange={handleNumberChange}
+                   value={value}
+                   min={min} max={max} /&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) <code>onValueChange?: (val: number) =&gt; void</code>. (2) <code>useState(50)</code>. (3) <code>onValueChange?.(rounded)</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">{/* DualInput.tsx */}</span>
+
+interface DualInputProps {
+    min?: number;
+    max?: number;
+    step?: number;
+    onValueChange?: (val: number) =&gt; void;
+}
+
+function DualInput({ min = 0, max = 100, step = 1, onValueChange }: DualInputProps) {
+    const [value, setValue] = useState(50);
+
+    const handleSliderChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+        const newVal = Number(e.target.value);
+        setValue(newVal);
+        onValueChange?.(newVal);
+    };
+
+    const handleNumberChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+        const raw = e.target.value;
+        if (raw !== "") {
+            const val = parseFloat(raw);
+            if (!isNaN(val)) {
+                const rounded = Math.round(val * 10) / 10;
+                setValue(rounded);
+                onValueChange?.(rounded);
+            }
+        }
+    };
+
+    return (
+        &lt;div className="d-flex align-items-center gap-3"&gt;
+            &lt;input type="range"
+                   onChange={handleSliderChange}
+                   value={value}
+                   min={min} max={max} step={step} /&gt;
+
+            &lt;span className="fw-bold text-nowrap text-center"
+                  style={{ minWidth: 80 }}&gt;
+                {value.toFixed(1)} %
+            &lt;/span&gt;
+
+            &lt;input type="number"
+                   onChange={handleNumberChange}
+                   value={value}
+                   min={min} max={max} /&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Achte auf Rundung: Der Slider liefert <code>number</code> (double), das Number-Feld auch. Verwende <code>Math.round</code> mit passender Genauigkeit.</li>
+    <li>Slider <code>step</code> sollte gröber sein (z.B. 1), das Number-Feld erlaubt beliebige Werte.</li>
+    <li>Vermeide unnötige Callbacks: Wenn sich der Wert nicht geändert hat, rufe <code>onValueChange</code> nicht auf.</li>
+    <li>Setze <code>min</code>/<code>max</code> auch als HTML-Attribute, damit der Browser den Slider korrekt skaliert.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Slider und Number-Feld zeigen immer denselben Wert an</li>
+    <li>Slider-Bewegung aktualisiert das Number-Feld in Echtzeit</li>
+    <li>Number-Eingabe aktualisiert den Slider (ggf. gerundet auf Step)</li>
+    <li>Min, Max und Step sind per Props konfigurierbar</li>
+    <li>Der Wert wird als formatierter String (z.B. "42,0 %") angezeigt</li>
+    <li>Wert-Änderungen werden per Callback nach oben gemeldet</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="04-dual-problem.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="04b-dual-controlled.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

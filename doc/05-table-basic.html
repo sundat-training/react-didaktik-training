@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 05 — Einfache Tabelle</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="05-table-problem.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="06-sortable-problem.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 05</div>
+  <h1>Einfache Tabelle</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du stellst eine Liste von Datenobjekten in einer HTML-Tabelle dar. Du lernst <code>map()</code> zur Iteration, bedingte Formatierung von Zeilen und den Umgang mit Props-Arrays.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code>&lt;table&gt;</code>
+    <code>&lt;thead&gt; / &lt;tbody&gt; / &lt;tfoot&gt;</code>
+    <code>map()</code>
+    <code>Conditional Rendering</code>
+    <code>Props: Order[]</code>
+    <code>CSS-Klasse bedingt setzen</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle ein Interface <code>Order</code> mit den Properties <code>price (number)</code>, <code>volume (number)</code>, <code>isBuyOrder (boolean)</code>, <code>location (string)</code>.</li>
+    <li><span class="step">2.</span> Erstelle <code>OrderTable.tsx</code> mit einem Props-Array <code>orders: Order[]</code>.</li>
+    <li><span class="step">3.</span> Baue eine HTML-Tabelle: <code>&lt;thead&gt;</code> mit Spaltenköpfen, <code>&lt;tbody&gt;</code> mit <code>map()</code> über die Orders.</li>
+    <li><span class="step">4.</span> Formatiere Buy-Orders mit grünem Hintergrund (<code>className="table-success"</code>), Sell-Orders mit rotem (<code>className="table-danger"</code>).</li>
+    <li><span class="step">5.</span> Zeige in der Fußzeile (<code>&lt;tfoot&gt;</code>) die Gesamtanzahl der Einträge an.</li>
+    <li><span class="step">6.</span> Wenn die Liste <code>null</code> oder leer ist, zeige eine Meldung "Keine Daten vorhanden" statt der Tabelle.</li>
+  </ol>
+</div>
+
+<div class="box" style="border-left:4px solid var(--accent);">
+  <h2>📋 Beispieldaten zum Kopieren</h2>
+  <pre><code><span class="cm">// Interface</span>
+interface Order {
+    price: number;
+    volume: number;
+    isBuyOrder: boolean;
+    location: string;
+}
+
+<span class="cm">// Beispieldaten</span>
+const orders: Order[] = [
+    { price: 45.20, volume: 1000, isBuyOrder: true,  location: "Jita" },
+    { price: 47.80, volume: 500,  isBuyOrder: false, location: "Amarr" },
+    { price: 44.90, volume: 2500, isBuyOrder: true,  location: "Dodixie" },
+    { price: 48.10, volume: 750,  isBuyOrder: false, location: "Jita" },
+    { price: 45.50, volume: 1200, isBuyOrder: true,  location: "Rens" },
+    { price: 49.00, volume: 300,  isBuyOrder: false, location: "Hek" },
+];</code></pre>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine:</p>
+    <pre><code><span class="cm">// Interface (TypeScript):</span>
+interface Order {
+    price: number;
+    volume: number;
+    isBuyOrder: boolean;
+    location: string;
+}
+
+<span class="cm">// Tabelle mit map():</span>
+&lt;table className="table table-striped"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Preis&lt;/th&gt;
+            &lt;th&gt;Volumen&lt;/th&gt;
+            &lt;th&gt;Typ&lt;/th&gt;
+            &lt;th&gt;Station&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        {orders.map(order =&gt; (
+            &lt;tr className={<span class="hl">order.isBuyOrder ? "table-success" : "table-danger"</span>}
+                key={order.location + order.price}&gt;
+                &lt;td&gt;{order.price.toFixed(2)}&lt;/td&gt;
+                ...
+            &lt;/tr&gt;
+        ))}
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;&lt;td colSpan={4}&gt;
+            {orders.length} Einträge
+        &lt;/td&gt;&lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</code></pre>
+    <p>💡 Bedingte Anzeige mit <code>{orders.length === 0 && &lt;p&gt;Keine Daten&lt;/p&gt;}</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen:</p>
+    <pre><code><span class="cm">{/* OrderTable.tsx */}</span>
+
+interface OrderTableProps {
+    title?: string;
+    orders: <span class="err">❌</span>; <span class="cm">// Typ des Arrays</span>
+}
+
+function OrderTable({ title = "Marktorder", orders }: OrderTableProps) {
+
+    if (<span class="err">❌</span>) { <span class="cm">// Prüfung: null oder leer</span>
+        return &lt;p className="text-muted"&gt;Keine Daten vorhanden&lt;/p&gt;;
+    }
+
+    return (
+        &lt;div className="card shadow"&gt;
+            &lt;div className="card-header fw-bold"&gt;{title}&lt;/div&gt;
+            &lt;div className="card-body"&gt;
+                &lt;div className="table-responsive"&gt;
+                    &lt;table className="table table-striped table-hover mb-0"&gt;
+                        &lt;thead className="table-dark"&gt;
+                            &lt;tr&gt;
+                                &lt;th&gt;Preis (ISK)&lt;/th&gt;
+                                &lt;th&gt;Volumen&lt;/th&gt;
+                                &lt;th&gt;Typ&lt;/th&gt;
+                                &lt;th&gt;Station&lt;/th&gt;
+                            &lt;/tr&gt;
+                        &lt;/thead&gt;
+                        &lt;tbody&gt;
+                            {orders.map(order =&gt; (
+                                &lt;tr className={order.isBuyOrder
+                                    ? "table-success"
+                                    : "table-danger"}
+                                    key={order.location + order.price}&gt;
+                                    &lt;td&gt;{order.price.<span class="err">❌</span>}&lt;/td&gt;
+                                    &lt;td&gt;{order.volume.toLocaleString()}&lt;/td&gt;
+                                    &lt;td&gt;{order.isBuyOrder ? "Ankauf" : "Verkauf"}&lt;/td&gt;
+                                    &lt;td&gt;{order.location}&lt;/td&gt;
+                                &lt;/tr&gt;
+                            ))}
+                        &lt;/tbody&gt;
+                        &lt;tfoot&gt;
+                            &lt;tr className="fw-bold"&gt;
+                                &lt;td colSpan={4} className="text-end"&gt;
+                                    {orders.length} Einträge gesamt
+                                &lt;/td&gt;
+                            &lt;/tr&gt;
+                        &lt;/tfoot&gt;
+                    &lt;/table&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) <code>Order[]</code>. (2) <code>!orders || orders.length === 0</code>. (3) <code>.toFixed(2)</code> für Price-Formatierung.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">{/* OrderTable.tsx */}</span>
+
+interface Order {
+    price: number;
+    volume: number;
+    isBuyOrder: boolean;
+    location: string;
+}
+
+interface OrderTableProps {
+    title?: string;
+    orders: Order[];
+}
+
+function OrderTable({ title = "Marktorder", orders }: OrderTableProps) {
+
+    if (!orders || orders.length === 0) {
+        return &lt;p className="text-muted text-center py-3"&gt;Keine Daten vorhanden&lt;/p&gt;;
+    }
+
+    return (
+        &lt;div className="card shadow"&gt;
+            &lt;div className="card-header fw-bold"&gt;{title}&lt;/div&gt;
+            &lt;div className="card-body"&gt;
+                &lt;div className="table-responsive"&gt;
+                    &lt;table className="table table-striped table-hover mb-0"&gt;
+                        &lt;thead className="table-dark"&gt;
+                            &lt;tr&gt;
+                                &lt;th&gt;Preis (ISK)&lt;/th&gt;
+                                &lt;th&gt;Volumen&lt;/th&gt;
+                                &lt;th&gt;Typ&lt;/th&gt;
+                                &lt;th&gt;Station&lt;/th&gt;
+                            &lt;/tr&gt;
+                        &lt;/thead&gt;
+                        &lt;tbody&gt;
+                            {orders.map(order =&gt; (
+                                &lt;tr className={order.isBuyOrder
+                                    ? "table-success"
+                                    : "table-danger"}
+                                    key={order.location + order.price}&gt;
+                                    &lt;td className="text-end"&gt;{order.price.toFixed(2)}&lt;/td&gt;
+                                    &lt;td className="text-end"&gt;{order.volume.toLocaleString()}&lt;/td&gt;
+                                    &lt;td&gt;{order.isBuyOrder ? "Ankauf" : "Verkauf"}&lt;/td&gt;
+                                    &lt;td&gt;{order.location}&lt;/td&gt;
+                                &lt;/tr&gt;
+                            ))}
+                        &lt;/tbody&gt;
+                        &lt;tfoot&gt;
+                            &lt;tr className="fw-bold"&gt;
+                                &lt;td colSpan={4} className="text-end"&gt;
+                                    {orders.length} Einträge gesamt
+                                &lt;/td&gt;
+                            &lt;/tr&gt;
+                        &lt;/tfoot&gt;
+                    &lt;/table&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Verwende <code>item.price.toFixed(2)</code> für formatierte Zahlen.</li>
+    <li>Bedingte CSS-Klasse: <code>className={item.isBuyOrder ? "table-success" : "table-danger"}</code>.</li>
+    <li>Gib einen <code>title</code>-Prop für die Card-Überschrift, damit die Komponente wiederverwendbar ist.</li>
+    <li>Überlege: Soll die Tabelle responsiv sein? → <code>&lt;div className="table-responsive"&gt;</code> drumherum.</li>
+    <li>Jeder <code>&lt;tr&gt;</code> braucht einen <code>key</code> für Reacts Reconciliation.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Tabelle zeigt alle übergebenen Orders mit Price, Volume, Type und Location an</li>
+    <li>Buy-Orders haben grünen, Sell-Orders roten Hintergrund</li>
+    <li>Fußzeile zeigt die Gesamtanzahl der Einträge</li>
+    <li>Bei leerer Liste erscheint "Keine Daten vorhanden"</li>
+    <li>Zahlen sind lesbar formatiert (Tausendertrennzeichen, 2 Dezimalstellen)</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="05-table-problem.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="06-sortable-problem.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

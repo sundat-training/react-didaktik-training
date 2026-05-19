@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 07 — Live-Suche / Autocomplete</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="07-search-problem.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="07b-search-controlled.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 07</div>
+  <h1>Live-Suche / Autocomplete</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du baust ein Textfeld, das bei jeder Tastatureingabe eine Dropdown-Liste mit passenden Vorschlägen anzeigt. Du lernst state-basierte Filterung (case-insensitive) via <code className="tag-tsx">useState</code> + <code className="tag-tsx">onChange</code>, das Positionieren eines absoluten Dropdowns und die Interaktion zwischen Texteingabe und Auswahl.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code className="tag-react">useState</code>
+    <code className="tag-tsx">onChange</code>
+    <code className="tag-ts">filter()</code>
+    <code className="tag-css">position: absolute</code>
+    <code className="tag-css">z-index / overflow-y</code>
+    <code>Conditional Rendering</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle eine Komponente <code>LiveSearch.tsx</code> mit einem <code>&lt;input type="text"&gt;</code> und einem Dropdown-<code>&lt;div&gt;</code> darunter.</li>
+    <li><span class="step">2.</span> Bei <code>onChange</code> filterst du ein Array von Items case-insensitive nach dem eingegebenen Text.</li>
+    <li><span class="step">3.</span> Zeige die gefilterten Ergebnisse als Liste von <code>&lt;li&gt;</code>- oder <code>&lt;button&gt;</code>-Elementen im Dropdown an.</li>
+    <li><span class="step">4.</span> Positioniere das Dropdown mit <code>position: absolute; z-index: 1000; max-height: 300px; overflow-y: auto</code>, direkt unter dem Input.</li>
+    <li><span class="step">5.</span> Klick auf ein Ergebnis setzt den Input-Text.</li>
+    <li><span class="step">6.</span> Das Dropdown schließt bei Klick außerhalb (Tipp: <code>useRef</code> + <code>useEffect</code> mit <code>mousedown</code>-Listener).</li>
+    <li><span class="step">7.</span> Erweitere das Datenmodell: Statt <code>string[]</code> übergib ein Array von Objekten, die sowohl <code>displayName</code> als auch <code>value</code> haben.</li>
+  </ol>
+</div>
+
+<div class="box" style="border-left:4px solid var(--accent);">
+  <h2>📋 Beispieldaten zum Kopieren</h2>
+  <pre><code><span class="cm">// Einfache Variante: string[]</span>
+const allItems = [
+    "Veldspar", "Scordite", "Pyroxeres", "Plagioclase", "Omber",
+    "Kernite", "Jaspet", "Hemorphite", "Hedbergite", "Gneiss",
+    "Dark Ochre", "Spodumain", "Crokite", "Bistot", "Arkonor",
+    "Mercoxit", "Morphite", "Zydrine", "Megacyte", "Nocxium",
+];
+
+<span class="cm">// Erweiterte Variante: Objekte mit displayName + value</span>
+interface SearchItem {
+  displayName: string;
+  value: string;
+}
+
+const itemObjects: SearchItem[] = [
+    { displayName: "Veldspar", value: "veldspar" },
+    { displayName: "Scordite", value: "scordite" },
+    { displayName: "Pyroxeres", value: "pyroxeres" },
+    // ...
+];</code></pre>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Code-Schnipsel</summary>
+  <div class="body">
+    <p>Die wichtigsten Bausteine:</p>
+    <pre><code><span class="cm">// Container mit position: relative für Dropdown-Positionierung:</span>
+&lt;div style=<span class="hl">"position: relative"</span>&gt;
+    &lt;input
+        type="text"
+        value={query}
+        onChange={handleInput}
+        onBlur={handleBlur}
+        onFocus={handleFocus}
+        placeholder="Suche..."
+    /&gt;
+
+    {showDropdown && filtered.length &gt; 0 && (
+        &lt;div style={{
+            position: "absolute",
+            zIndex: 1000,
+            maxHeight: 300,
+            overflowY: "auto"
+        }}&gt;
+            {filtered.map(item =&gt; (
+                &lt;button key={item.value}
+                    onMouseDown={<span class="hl">() =&gt; selectItem(item)</span>}&gt;
+                    {item.displayName}
+                &lt;/button&gt;
+            ))}
+        &lt;/div&gt;
+    )}
+&lt;/div&gt;
+
+<span class="cm">// Case-insensitive Filterung:</span>
+const handleInput = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    setSearchText(e.target.value);
+    const q = e.target.value.toLowerCase();
+    setFiltered(items.filter(x =&gt;
+        x.displayName.<span class="hl">toLowerCase().includes(q)</span>
+        || x.value.toLowerCase().includes(q)
+    ));
+    setShowDropdown(true);
+};
+
+<span class="cm">// onMouseDown statt onClick, damit onBlur nicht dazwischenfunkt:</span>
+const selectItem = (item: SearchItem) =&gt; {
+    setSearchText(item.displayName);
+    setShowDropdown(false);
+    onItemSelected?.(item.value);
+};</code></pre>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Teil-Lösung – Code-Gerüst</summary>
+  <div class="body">
+    <p>Ergänze die <span class="err">❌</span>-Stellen:</p>
+    <pre><code><span class="cm">// SearchItem.ts (Datenmodell)</span>
+export interface SearchItem {
+    displayName: string;
+    value: string;
+}</code></pre>
+    <pre><code><span class="cm">/* LiveSearch.tsx */</span>
+
+&lt;div style={{ position: "relative" }}&gt;
+    &lt;input type="text"
+        onChange={handleInput}
+        onBlur={handleBlur}
+        onFocus={<span class="err">❌</span>}
+        value={searchText}
+        placeholder="Suche..." /&gt;
+
+    {showDropdown && filtered.length &gt; 0 && (
+        &lt;div style={{
+            position: "absolute", width: "100%",
+            zIndex: 1000, maxHeight: 300, overflowY: "auto",
+            background: "#fff", border: "1px solid #ccc",
+            borderRadius: 4
+        }}&gt;
+            {filtered.map(item =&gt; (
+                &lt;button key={item.value}
+                    type="button"
+                    className="dropdown-item"
+                    onMouseDown={<span class="err">❌</span>}&gt;
+                    {item.displayName}
+                    &lt;small&gt;({item.value})&lt;/small&gt;
+                &lt;/button&gt;
+            ))}
+        &lt;/div&gt;
+    )}
+    {showDropdown && !filtered.length && searchText && (
+        &lt;div style={{
+            position: "absolute", width: "100%",
+            zIndex: 1000, padding: 8,
+            background: "#fff", border: "1px solid #ccc"
+        }}&gt;
+            Keine Ergebnisse
+        &lt;/div&gt;
+    )}
+&lt;/div&gt;
+
+function LiveSearch({ items, onItemSelected }: Props) {
+    const <span class="err">❌</span> = useState("");
+    const [filtered, setFiltered] = useState&lt;SearchItem[]&gt;([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    const handleInput = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+        const q = e.target.value;
+        setSearchText(q);
+        setFiltered(items.filter(x =&gt;
+            x.displayName.<span class="err">❌</span>(q.toLowerCase()) ||
+            x.value.toLowerCase().includes(q.toLowerCase())
+        ));
+        setShowDropdown(true);
+    };
+
+    const handleBlur = () =&gt; {
+        <span class="err">❌</span> <span class="cm">// Dropdown schließen mit Verzögerung</span>
+    };
+
+    const handleFocus = () =&gt; {
+        if (searchText) setShowDropdown(true);
+    };
+
+    const selectItem = (item: SearchItem) =&gt; {
+        setSearchText(item.displayName);
+        setShowDropdown(false);
+        <span class="err">❌</span> <span class="cm">// Callback feuern</span>
+    };
+}</code></pre>
+    <p>📌 <strong>Fehlend:</strong> (1) <code>handleFocus</code> (2) <code>toLowerCase().includes</code> (3) <code>setTimeout(() => setShowDropdown(false), 200)</code> (4) <code>onItemSelected?.(item.value)</code>.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständige Lösung</summary>
+  <div class="body">
+    <pre><code><span class="cm">// SearchItem.ts</span>
+export interface SearchItem {
+    displayName: string;
+    value: string;
+}</code></pre>
+    <pre><code><span class="cm">/* LiveSearch.tsx */</span>
+import { useState } from "react";
+import type { SearchItem } from "./SearchItem";
+
+interface Props {
+    items: SearchItem[];
+    onItemSelected?: (value: string) =&gt; void;
+}
+
+export function LiveSearch({ items, onItemSelected }: Props) {
+    const [searchText, setSearchText] = useState("");
+    const [filtered, setFiltered] = useState&lt;SearchItem[]&gt;([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    const handleInput = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+        const q = e.target.value;
+        setSearchText(q);
+        setFiltered(items.filter(x =&gt;
+            x.displayName.toLowerCase().includes(q.toLowerCase()) ||
+            x.value.toLowerCase().includes(q.toLowerCase())
+        ));
+        setShowDropdown(true);
+    };
+
+    const handleBlur = () =&gt; {
+        setTimeout(() =&gt; setShowDropdown(false), 200);
+    };
+
+    const handleFocus = () =&gt; {
+        if (searchText) setShowDropdown(true);
+    };
+
+    const selectItem = (item: SearchItem) =&gt; {
+        setSearchText(item.displayName);
+        setShowDropdown(false);
+        onItemSelected?.(item.value);
+    };
+
+    return (
+        &lt;div style={{ position: "relative" }}&gt;
+            &lt;input type="text"
+                onChange={handleInput}
+                onBlur={handleBlur}
+                onFocus={handleFocus}
+                value={searchText}
+                placeholder="Suche..." /&gt;
+
+            {showDropdown && filtered.length &gt; 0 && (
+                &lt;div style={{
+                    position: "absolute", width: "100%",
+                    zIndex: 1000, maxHeight: 300, overflowY: "auto",
+                    background: "#fff", border: "1px solid #ccc",
+                    borderRadius: 4
+                }}&gt;
+                    {filtered.map(item =&gt; (
+                        &lt;button key={item.value}
+                            type="button"
+                            className="dropdown-item"
+                            onMouseDown={() =&gt; selectItem(item)}&gt;
+                            {item.displayName}
+                            &lt;small&gt;({item.value})&lt;/small&gt;
+                        &lt;/button&gt;
+                    ))}
+                &lt;/div&gt;
+            )}
+
+            {showDropdown && !filtered.length && searchText && (
+                &lt;div style={{
+                    position: "absolute", width: "100%",
+                    zIndex: 1000, padding: 8,
+                    background: "#fff", border: "1px solid #ccc"
+                }}&gt;
+                    Keine Ergebnisse
+                &lt;/div&gt;
+            )}
+        &lt;/div&gt;
+    );
+}</code></pre>
+    <pre><code><span class="cm">/* LiveSearch.css */</span>
+.dropdown-item:hover {
+    background-color: #f1f3f5;
+}</code></pre>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Verwende <code>toLowerCase().includes()</code> für case-insensitive Filterung.</li>
+    <li>Der Dropdown-Container muss <code>position: relative</code> sein, damit das absolute Dropdown korrekt ausrichtet.</li>
+    <li>Das Schließen bei Klick außerhalb: Nutze <code>useRef</code> + <code>useEffect</code> mit <code>mousedown</code>-Event auf <code>document</code>.</li>
+    <li>Wenn die gefilterte Liste leer ist, zeige "Keine Ergebnisse" im Dropdown an.</li>
+    <li>Markiere den Suchtreffer im Dropdown fett (substring + <code>&lt;strong&gt;</code>).</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Dropdown erscheint während der Eingabe unter dem Textfeld</li>
+    <li>Dropdown filtert case-insensitive in Echtzeit</li>
+    <li>Dropdown schließt bei Auswahl eines Eintrags</li>
+    <li>Dropdown schließt bei Klick außerhalb des Eingabebereichs</li>
+    <li>Auswahl setzt den Wert im Textfeld und feuert Callback</li>
+    <li>Bei leerer Trefferliste erscheint "Keine Ergebnisse"</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="07-search-problem.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="07b-search-controlled.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

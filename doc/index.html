@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Component Training — Aufgabenübersicht</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>React Component Training</h1>
+  <p>Aufeinander aufbauende Aufgaben, die Schritt für Schritt in die Welt der React-Komponenten einführen. Jede Aufgabe ist in sich abgeschlossen und baut auf den Konzepten der vorherigen auf.</p>
+</div>
+
+<div class="container">
+
+<div class="task-grid">
+
+  <a href="00-setup.html" class="task-card" style="border-left:4px solid var(--green);">
+    <div class="num">Vorbereitung</div>
+    <h3>Projekt aufsetzen</h3>
+    <p>Vite + React + TypeScript Projekt erstellen, Router einrichten, Projektstruktur anlegen.</p>
+    <div class="tags">
+      <span class="tag tag-ts">Vite</span>
+      <span class="tag tag-react">React Router</span>
+      <span class="tag tag-ts">TypeScript</span>
+    </div>
+  </a>
+
+  <a href="01-select-problem.html" class="problem-row">
+    <span class="label">01</span>
+    <h3>Select: Umsetzen einer simplen Select-Komponente</h3>
+    <p>Interaktive Demo</p>
+  </a>
+
+  <a href="01a-select-controlled.html" class="task-card">
+    <div class="num">Aufgabe 01a</div>
+    <h3>Select controlled</h3>
+    <p>Dropdown mit onChange und Callback-Props – du steuerst value und Handler selbst.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;select&gt;</span>
+      <span class="tag tag-react">onChange</span>
+      <span class="tag tag-react">callback props</span>
+    </div>
+  </a>
+
+  <a href="01b-select-uncontrolled.html" class="task-card">
+    <div class="num">Aufgabe 01b</div>
+    <h3>Select mit useRef</h3>
+    <p>Dropdown mit useRef und onChange – weniger State, gleiches Ergebnis mit Parent-Benachrichtigung.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;select&gt;</span>
+      <span class="tag tag-react">useRef</span>
+      <span class="tag tag-react">onChange</span>
+    </div>
+  </a>
+
+  <a href="02-nested-problem.html" class="problem-row">
+    <span class="label">02</span>
+    <h3>Gekaskadete Selects: Zwei abhängige Dropdowns</h3>
+    <p>Interaktive Demo</p>
+  </a>
+
+  <a href="02a-nested-controlled.html" class="task-card">
+    <div class="num">Aufgabe 02a</div>
+    <h3>Gekaskadete Selects manuell</h3>
+    <p>Zwei abhängige Dropdowns mit onChange, ChangeEvent und Parent→Child Datenfluss.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;select&gt;</span>
+      <span class="tag tag-react">onChange</span>
+      <span class="tag tag-react">callback props</span>
+    </div>
+  </a>
+
+  <a href="02b-nested-uncontrolled.html" class="task-card">
+    <div class="num">Aufgabe 02b</div>
+    <h3>Gekaskadete Selects mit useState</h3>
+    <p>Zwei abhängige Dropdowns mit useState und onChange – weniger Code in jeder Child-Komponente.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;select&gt;</span>
+      <span class="tag tag-react">useState</span>
+      <span class="tag tag-react">state lifting</span>
+    </div>
+  </a>
+
+  <a href="03-input-problem.html" class="problem-row">
+    <span class="label">03</span>
+    <h3>Input mit Validierung: Numerische Eingabe mit Fehleranzeige</h3>
+    <p>Interaktive Demo</p>
+  </a>
+
+  <a href="03-input-validation.html" class="task-card">
+    <div class="num">Aufgabe 03</div>
+    <h3>Input mit Validierung</h3>
+    <p>Ein numerisches Eingabefeld, das auf gültige Werte prüft und Fehler anzeigt.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;input&gt;</span>
+      <span class="tag tag-ts">validation</span>
+      <span class="tag tag-tsx">Conditional Rendering</span>
+    </div>
+  </a>
+
+  <a href="03b-input-controlled.html" class="task-card">
+    <div class="num">Aufgabe 03b</div>
+    <h3>Input mit useState</h3>
+    <p>Numerisches Eingabefeld mit useState und onChange – weniger Boilerplate.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;input&gt;</span>
+      <span class="tag tag-react">useState</span>
+      <span class="tag tag-react">onChange</span>
+    </div>
+  </a>
+
+  <a href="04-dual-problem.html" class="problem-row">
+    <span class="label">04</span>
+    <h3>Gekoppelte Inputs: Slider + Zahlenfeld synchron</h3>
+    <p>Interaktive Demo</p>
+  </a>
+
+  <a href="04-dual-input.html" class="task-card">
+    <div class="num">Aufgabe 04</div>
+    <h3>Gekoppelte Inputs</h3>
+    <p>Slider und Zahlenfeld, die sich gegenseitig synchron halten – bidirektionale Steuerung.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;input type="range"&gt;</span>
+      <span class="tag tag-react">onChange</span>
+      <span class="tag tag-react">Sync</span>
+    </div>
+  </a>
+
+  <a href="04b-dual-controlled.html" class="task-card">
+    <div class="num">Aufgabe 04b</div>
+    <h3>Gekoppelte Inputs mit useState</h3>
+    <p>Slider + Number-Feld mit useState – beide schreiben in dieselbe State-Variable, kein manueller Sync.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;input&gt;</span>
+      <span class="tag tag-react">useState</span>
+      <span class="tag tag-react">Sync</span>
+    </div>
+  </a>
+
+  <a href="05-table-problem.html" class="problem-row">
+    <span class="label">05</span>
+    <h3>Einfache Tabelle: Daten aus einer Liste anzeigen</h3>
+    <p>Interaktive Demo</p>
+  </a>
+
+  <a href="05-table-basic.html" class="task-card">
+    <div class="num">Aufgabe 05</div>
+    <h3>Einfache Tabelle</h3>
+    <p>Daten aus einer Liste in einer HTML-Tabelle darstellen – der erste Schritt zu DataGrids.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;table&gt;</span>
+      <span class="tag tag-tsx">map()</span>
+      <span class="tag tag-tsx">Conditional Rendering</span>
+    </div>
+  </a>
+
+  <a href="06-sortable-problem.html" class="problem-row">
+    <span class="label">06</span>
+    <h3>Sortierbare Tabelle: Klickbare Spalten + Filter</h3>
+    <p>Interaktive Demo</p>
+  </a>
+
+  <a href="06-table-sortable.html" class="task-card">
+    <div class="num">Aufgabe 06</div>
+    <h3>Sortierbare Tabelle</h3>
+    <p>Tabellenspalten per Klick sortieren, Einträge filtern – Interaktivität in Datenansichten.</p>
+    <div class="tags">
+      <span class="tag tag-ts">Array.sort</span>
+      <span class="tag tag-react">State</span>
+      <span class="tag tag-css">▲▼</span>
+    </div>
+  </a>
+
+  <a href="07-search-problem.html" class="problem-row">
+    <span class="label">07</span>
+    <h3>Live-Suche / Autocomplete</h3>
+    <p>Interaktive Demo</p>
+  </a>
+
+  <a href="07-live-search.html" class="task-card">
+    <div class="num">Aufgabe 07</div>
+    <h3>Live-Suche / Autocomplete</h3>
+    <p>Ein Textfeld, das während der Eingabe Vorschläge filtert – Echtzeit-UI mit eigenem Dropdown.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;input&gt;</span>
+      <span class="tag tag-react">onChange</span>
+      <span class="tag tag-css">Positionierung</span>
+    </div>
+  </a>
+
+  <a href="07b-search-controlled.html" class="task-card">
+    <div class="num">Aufgabe 07b</div>
+    <h3>Live-Suche mit useState</h3>
+    <p>Autocomplete mit useState und onChange – Filterung ohne manuellen Handler.</p>
+    <div class="tags">
+      <span class="tag tag-html">&lt;input&gt;</span>
+      <span class="tag tag-react">useState</span>
+      <span class="tag tag-react">onChange</span>
+    </div>
+  </a>
+
+  <a href="08-api-problem.html" class="problem-row">
+    <span class="label">08</span>
+    <h3>API-Integration: Daten von einer REST-API laden</h3>
+    <p>Interaktive Demo</p>
+  </a>
+
+  <a href="08-api-fetch.html" class="task-card">
+    <div class="num">Aufgabe 08</div>
+    <h3>API-Integration mit fetch</h3>
+    <p>Daten von einer REST-API abrufen, paginieren und in der UI darstellen.</p>
+    <div class="tags">
+      <span class="tag tag-ts">fetch</span>
+      <span class="tag tag-ts">async/await</span>
+    </div>
+  </a>
+
+  <a href="09-state-problem.html" class="problem-row">
+    <span class="label">09</span>
+    <h3>Component State: Alles zusammen – eine Seite, mehrere Komponenten</h3>
+    <p>Interaktive Demo</p>
+  </a>
+
+  <a href="09-component-state.html" class="task-card">
+    <div class="num">Aufgabe 09</div>
+    <h3>Component State</h3>
+    <p>Komponenten-übergreifendes State-Management mit Props und Callbacks.</p>
+    <div class="tags">
+      <span class="tag tag-ts">Props</span>
+      <span class="tag tag-react">callback props</span>
+      <span class="tag tag-tsx">Parent→Child</span>
+    </div>
+  </a>
+
+  <a href="09b-state-controlled.html" class="task-card">
+    <div class="num">Aufgabe 09b</div>
+    <h3>Component State mit Callback-Props</h3>
+    <p>Props und Callbacks auf Child-Komponenten – kein manuelles Event-Verdrahten im Parent.</p>
+    <div class="tags">
+      <span class="tag tag-react">useState</span>
+      <span class="tag tag-react">state lifting</span>
+      <span class="tag tag-react">callback props</span>
+    </div>
+  </a>
+
+  <a href="10-theme-problem.html" class="problem-row">
+    <span class="label">10</span>
+    <h3>CSS-Techniken & Theme: Dark Mode, Scoped CSS, Responsive</h3>
+    <p>Interaktive Demo</p>
+  </a>
+
+  <a href="10-css-theme.html" class="task-card">
+    <div class="num">Aufgabe 10</div>
+    <h3>CSS-Techniken & Theme</h3>
+    <p>CSS Modules, Dark/Light-Mode, responsive Layouts – das Finish für jede Komponente.</p>
+    <div class="tags">
+      <span class="tag tag-css">CSS Modules</span>
+      <span class="tag tag-css">:global</span>
+      <span class="tag tag-css">Dark Mode</span>
+    </div>
+  </a>
+
+</div>
+
+</div>
+
+</body>
+</html>

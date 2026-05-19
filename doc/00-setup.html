@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grundprojekt aufsetzen — Vorbereitung</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="#" class="disabled">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="01-select-problem.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Vorbereitung</div>
+  <h1>Grundprojekt aufsetzen</h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Ziel</h2>
+  <p>Du richtest ein neues <strong>Vite + React + TypeScript</strong> Projekt mit Router ein. Dieses Projekt verwendest du für alle folgenden Aufgaben. Ein sauberes Setup ist die halbe Miete – danach kannst du dich ganz auf die Komponenten konzentrieren.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code>Vite</code>
+    <code>React</code>
+    <code>TypeScript</code>
+    <code>react-router-dom</code>
+    <code>tsconfig paths</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle ein neues Vite-Projekt mit React + TypeScript Template.</li>
+    <li><span class="step">2.</span> Installiere React Router DOM für clientseitige Navigation.</li>
+    <li><span class="step">3.</span> Lege die empfohlene Projektstruktur an.</li>
+    <li><span class="step">4.</span> Richte den Router mit einer Startseite und einer About-Seite ein.</li>
+    <li><span class="step">5.</span> Erstelle ein Root-Layout mit Navigation (Navbar + Outlet).</li>
+    <li><span class="step">6.</span> Optional: Richte TypeScript-Pfad-Aliase für saubere Imports ein.</li>
+  </ol>
+</div>
+
+<div class="box" style="border-left:4px solid var(--accent);">
+  <h2>📋 Terminal-Befehle zum Kopieren</h2>
+  <pre><code><span class="cm"># 1. Projekt erstellen</span>
+npm create vite@latest mein-projekt -- --template react-ts
+cd mein-projekt
+npm install
+
+<span class="cm"># 2. React Router hinzufügen</span>
+npm install react-router-dom
+
+<span class="cm"># 3. (Optional) Pfad-Alias-Unterstützung</span>
+npm install -D vite-tsconfig-paths</code></pre>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Empfohlene Projektstruktur</summary>
+  <div class="body">
+    <p>So sollte deine <code>src/</code>-Struktur aussehen:</p>
+    <pre><code>src/
+├── main.tsx
+├── App.tsx
+├── router/
+│   └── router.tsx
+├── pages/
+│   ├── Home.tsx
+│   └── About.tsx
+├── components/
+│   └── layout/
+│       └── Navbar.tsx
+└── assets/</code></pre>
+    <p>Diese Struktur ist bewusst schlank gehalten – für jede Aufgabe kommt später ein eigener Ordner unter <code>pages/</code> dazu. Die <code>components/</code>-Ordner sammeln wiederverwendbare UI-Elemente.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Router und Layout einrichten</summary>
+  <div class="body">
+    <p>Erstelle <code>src/router/router.tsx</code>:</p>
+    <pre><code>import { createBrowserRouter } from 'react-router-dom';
+import RootLayout from '../App';
+import Home from '../pages/Home';
+import About from '../pages/About';
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: &lt;RootLayout /&gt;,
+    children: [
+      { index: true, element: &lt;Home /&gt; },
+      { path: 'about', element: &lt;About /&gt; },
+    ],
+  },
+]);</code></pre>
+    <p><code>src/main.tsx</code>:</p>
+    <pre><code>import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router/router';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  &lt;React.StrictMode&gt;
+    &lt;RouterProvider router={router} /&gt;
+  &lt;/React.StrictMode&gt;
+);</code></pre>
+    <p><code>src/App.tsx</code> – Root-Layout mit Navbar:</p>
+    <pre><code>import Navbar from './components/layout/Navbar';
+import { Outlet } from 'react-router-dom';
+
+function RootLayout() {
+  return (
+    &lt;div className="min-h-screen bg-zinc-50"&gt;
+      &lt;Navbar /&gt;
+      &lt;main&gt;
+        &lt;Outlet /&gt;
+      &lt;/main&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default RootLayout;</code></pre>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Vollständiges Setup</summary>
+  <div class="body">
+    <p><strong>Navbar-Komponente</strong> (<code>src/components/layout/Navbar.tsx</code>):</p>
+    <pre><code>import { NavLink } from 'react-router-dom';
+
+export default function Navbar() {
+  return (
+    &lt;nav className="border-b"&gt;
+      &lt;div className="max-w-7xl mx-auto px-6 py-4
+                  flex justify-between items-center"&gt;
+        &lt;h1 className="text-2xl font-bold"&gt;
+          React Training
+        &lt;/h1&gt;
+        &lt;div className="flex gap-6"&gt;
+          &lt;NavLink
+            to="/"
+            className={({ isActive }) =&gt;
+              isActive ? 'text-blue-600 font-medium'
+                      : 'hover:text-blue-600'}
+          &gt;
+            Home
+          &lt;/NavLink&gt;
+          &lt;NavLink
+            to="/about"
+            className={({ isActive }) =&gt;
+              isActive ? 'text-blue-600 font-medium'
+                      : 'hover:text-blue-600'}
+          &gt;
+            Über
+          &lt;/NavLink&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/nav&gt;
+  );
+}</code></pre>
+
+    <p><strong>Startseite</strong> (<code>src/pages/Home.tsx</code>):</p>
+    <pre><code>export default function Home() {
+  return (
+    &lt;div className="max-w-4xl mx-auto px-6 py-12"&gt;
+      &lt;h1 className="text-3xl font-bold mb-4"&gt;
+        React Component Training
+      &lt;/h1&gt;
+      &lt;p className="text-lg text-gray-600"&gt;
+        Willkommen! Hier lernst du Schritt für Schritt,
+        React-Komponenten zu bauen.
+      &lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+    <p><strong>Bonus: TypeScript-Pfad-Aliase</strong></p>
+    <p><code>vite.config.ts</code>:</p>
+    <pre><code>import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tsconfigPaths from 'vite-tsconfig-paths';
+
+export default defineConfig({
+  plugins: [react(), tsconfigPaths()],
+});</code></pre>
+    <p><code>tsconfig.json</code> (Abschnitt <code>compilerOptions</code> ergänzen):</p>
+    <pre><code>{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}</code></pre>
+    <p>Danach sind Imports wie <code>import Navbar from '@/components/layout/Navbar'</code> möglich – keine relativen Kaskaden mehr.</p>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Vite startet mit <code>npm run dev</code> – der Dev-Server hat Hot Module Replacement (HMR). Änderungen siehst du sofort im Browser.</li>
+    <li>React Router v7 (react-router-dom) verwendet <code>createBrowserRouter</code> – das ist der empfohlene Weg für TypeScript-Projekte.</li>
+    <li>Der <code>&lt;Outlet /&gt;</code> im Layout rendert die jeweilige Kind-Route. Ohne ihn wird nichts angezeigt.</li>
+    <li><code>NavLink</code> von React Router bietet automatische <code>isActive</code>-Erkennung – ideal für Navigationsmenüs.</li>
+    <li>Lege einen <code>index.css</code>-Globalstyle an (z.B. Tailwind-CSS oder einfache Custom Properties) – aber das ist optional.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li><code>npm run dev</code> startet ohne Fehler</li>
+    <li>Die Startseite zeigt "React Component Training" an</li>
+    <li>Die About-Seite ist über die Navigation erreichbar</li>
+    <li>Die Navbar hebt die aktive Seite farblich hervor</li>
+    <li>Die Ordnerstruktur folgt dem empfohlenen Schema</li>
+    <li>Bonus: <code>@/</code>-Imports funktionieren (wenn Alias eingerichtet)</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="#" class="disabled">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="01-select-problem.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>

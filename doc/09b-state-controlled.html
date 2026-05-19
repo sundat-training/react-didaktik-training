@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe 09b — Component State mit Callback-Props</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="container">
+    <span class="nav-title">React Component Training</span>
+    <div class="nav-links">
+      <a href="index.html">Übersicht</a>
+      <span class="sep">·</span>
+      <a href="09-component-state.html">← Vorherige</a>
+      <span class="sep">·</span>
+      <a href="10-theme-problem.html">Nächste →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="page-header">
+  <div class="num">Aufgabe 09b</div>
+  <h1>Component State mit <span class="hl">Callback-Props</span></h1>
+</div>
+
+<div class="box goal">
+  <h2>🎯 Lernziel</h2>
+  <p>Du löst dieselbe Aufgabe wie in <strong>09</strong>, aber mit vollständig kontrollierten Komponenten. Der Parent hält den gesamten State – die Children haben kein internes <code>useState</code> mehr. Jeder Wert und jedes Event wird über Props gesteuert.</p>
+</div>
+
+<div class="box concepts">
+  <h2>🔧 Konzepte</h2>
+  <div class="concept-list">
+    <code class="tag-react">value + onChange</code>
+    <code class="tag-react">Controlled Components</code>
+    <code class="tag-react">Lifting State Up</code>
+    <code class="tag-tsx">interface Props</code>
+    <code class="tag-tsx">ChangeEvent</code>
+    <code class="tag-react">Parent→Child ohne internen State</code>
+  </div>
+</div>
+
+<div class="box task-box">
+  <h2>📋 Aufgabe</h2>
+  <ol>
+    <li><span class="step">1.</span> Erstelle eine Seite <code>Calculator.tsx</code> – sie ist der "Controller".</li>
+    <li><span class="step">2.</span> Baue die Komponenten ein – aber alle Children sind <strong>vollständig kontrolliert</strong> (kein <code>useState</code> im Child, nur <code>value</code> + <code>onChange</code> Props).</li>
+    <li><span class="step">3.</span> Jede Child-Komponente bekommt ihren aktuellen Wert per <code>value</code>-Prop und meldet Änderungen per <code>onChange</code>-Callback.</li>
+    <li><span class="step">4.</span> Der Parent hat alle Handler-Methoden, die den State aktualisieren und die Berechnung triggern.</li>
+    <li><span class="step">5.</span> Verwende <code>useEffect</code> (optional), um auf Änderungen zu reagieren und das Ergebnis automatisch zu berechnen.</li>
+  </ol>
+</div>
+
+<div class="box note">
+  <h2>📌 Der Unterschied zu 09 — Trade-off</h2>
+
+  <table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:12px;">
+    <thead>
+      <tr style="border-bottom:2px solid var(--border);">
+        <th style="padding:8px;text-align:left;">Aspekt</th>
+        <th style="padding:8px;text-align:left;">09 (Child mit useState)</th>
+        <th style="padding:8px;text-align:left;">09b (Controlled)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:8px;font-weight:600;">Child-State</td>
+        <td style="padding:8px;">Eigenes useState + Callback-Prop</td>
+        <td style="padding:8px;">Kein State, nur value + onChange</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:8px;font-weight:600;">Parent-Code</td>
+        <td style="padding:8px;">State + Callback-Props + Handler</td>
+        <td style="padding:8px;">State + onChange + Handler (direkter)</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:8px;font-weight:600;">Datenfluss</td>
+        <td style="padding:8px;">Child useState → Callback → Parent State → Prop</td>
+        <td style="padding:8px;">Parent State → Prop → onChange → Parent State</td>
+      </tr>
+      <tr>
+        <td style="padding:8px;font-weight:600;">Wiederverwendbarkeit</td>
+        <td style="padding:8px;">Kann standalone ohne Parent</td>
+        <td style="padding:8px;">Braucht immer einen Parent mit State</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><strong>⭐ Empfehlung: Variante 09b (Controlled) für diese Übung.</strong> Klarerer uni-direktionaler Datenfluss, Single Source of Truth im Parent, weniger Überraschungen.</p>
+</div>
+
+<details class="collapsible hint-1">
+  <summary>💡 Hinweise – Controlled Components in der Praxis</summary>
+  <div class="body">
+    <p>So funktioniert das Controlled-Component-Pattern:</p>
+    <pre><code><span class="cm">// Child-Komponente hat KEINEN eigenen State:</span>
+interface CategorySelectProps {
+  value: string;
+  onChange: (cat: string) => void;
+}
+
+function CategorySelect({ value, onChange }: CategorySelectProps) {
+  return (
+    &lt;select value={value}
+            onChange={e =&gt; onChange(e.target.value)}&gt;
+      &lt;option value="" disabled&gt;Bitte wählen...&lt;/option&gt;
+      {categories.map(c =&gt; (
+        &lt;option key={c} value={c}&gt;{c}&lt;/option&gt;
+      ))}
+    &lt;/select&gt;
+  );
+}
+
+<span class="cm">// Parent gibt value und onChange:</span>
+&lt;CategorySelect value={selectedCategory}
+                onChange={handleCategoryChanged} /&gt;</code></pre>
+    <p>💡 Der gesamte State lebt im Parent. Das Child ist ein reines "Render"-Element ohne eigene Logik.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-2">
+  <summary>🔧 Parent-Seite (Code-Gerüst)</summary>
+  <div class="body">
+    <p>Vergleiche: <strong>09 (Child-State)</strong> vs. <strong>09b (Controlled)</strong>:</p>
+    <pre><code><span class="cm">// 09 — Child hat useState + Callback</span>
+&lt;CategorySelect onCategoryChanged={handleCategory} /&gt;
+&lt;QuantityInput onQuantityChanged={handleQuantity} /&gt;
+&lt;DualInput onValueChanged={handleFee} /&gt;
+
+<span class="cm">// 09b — Child hat keinen State, Parent steuert alles</span>
+&lt;CategorySelect value={selectedCategory}
+                onChange={setSelectedCategory} /&gt;
+&lt;QuantityInput value={quantity}
+               onChange={setQuantity} /&gt;
+&lt;DualInput value={fee}
+           onChange={setFee} /&gt;
+
+const [selectedCategory, setSelectedCategory] = useState("");
+const [quantity, setQuantity] = useState(0);
+const [fee, setFee] = useState(2.5);
+const [result, setResult] = useState&lt;number | null&gt;(null);
+
+useEffect(() => {
+  if (selectedCategory && quantity > 0) {
+    setResult(quantity * (1 + fee / 100));
+  } else {
+    setResult(null);
+  }
+}, [selectedCategory, quantity, fee]);</code></pre>
+    <p>📌 <strong>Vorteil:</strong> Keine Handler-Funktionen nötig – <code>setSelectedCategory</code> kann direkt als <code>onChange</code> übergeben werden, weil die Signatur <code>(value: string) => void</code> mit <code>useState</code> kompatibel ist.</p>
+  </div>
+</details>
+
+<details class="collapsible hint-3">
+  <summary>🏁 Erforderliche Child-Schnittstellen</summary>
+  <div class="body">
+    <p>Jede Child-Komponente braucht <code>value</code> + <code>onChange</code> Props (statt eigenem useState + Callback):</p>
+    <pre><code><span class="cm">// CategorySelect (controlled)</span>
+interface CategorySelectProps {
+  value: string;
+  onChange: (cat: string) => void;
+}
+
+<span class="cm">// QuantityInput (controlled)</span>
+interface QuantityInputProps {
+  value: number;
+  onChange: (val: number) => void;
+  disabled?: boolean;
+}
+
+<span class="cm">// DualInput (controlled)</span>
+interface DualInputProps {
+  value: number;
+  onChange: (val: number) => void;
+}
+
+<span class="cm">// Parent-Seite Calculator.tsx</span>
+&lt;CategorySelect value={selectedCategory}
+                onChange={handleCategoryChanged} /&gt;
+&lt;QuantityInput value={quantity}
+               onChange={setQuantity}
+               disabled={!selectedItem} /&gt;
+&lt;DualInput value={fee} onChange={setFee} /&gt;
+
+const [selectedCategory, setSelectedCategory] = useState("");
+const [selectedItem, setSelectedItem] = useState("");
+const [quantity, setQuantity] = useState(0);
+const [fee, setFee] = useState(2.5);
+
+const handleCategoryChanged = (cat: string) => {
+  setSelectedCategory(cat);
+  setSelectedItem(""); <span class="cm">// Reset Item</span>
+};</code></pre>
+    <p>💡 Die alten Callback-Props (<code>onCategoryChanged</code>, <code>onQuantityChanged</code>) entfallen – die Komponente unterstützt nur noch das Controlled-Pattern.</p>
+  </div>
+</details>
+
+<div class="box tip">
+  <h2>💡 Tipps</h2>
+  <ul>
+    <li>Das Controlled-Pattern ist die idiomatischste React-Art, Formulare zu bauen.</li>
+    <li>Der Parent ist die "Single Source of Truth" – keine versteckten State-Updates im Child.</li>
+    <li><code>useEffect</code> kann genutzt werden, um auf State-Änderungen zu reagieren, ist hier aber optional (Berechnung kann auch im Handler passieren).</li>
+    <li>Setter von <code>useState</code> können direkt als <code>onChange</code> übergeben werden, wenn die Typen kompatibel sind.</li>
+  </ul>
+</div>
+
+<div class="box accept">
+  <h2>✅ Akzeptanzkriterien</h2>
+  <ul class="checklist">
+    <li>Children haben kein <code>useState</code> – nur <code>value</code> + <code>onChange</code> Props</li>
+    <li>Parent hält den gesamten State</li>
+    <li>Berechnung läuft über Handler oder <code>useEffect</code></li>
+    <li>Bei Kategorie-Wechsel wird das Item zurückgesetzt</li>
+  </ul>
+</div>
+
+<div class="page-footer">
+  <a href="09-component-state.html">← Vorherige</a>
+  <a href="index.html">Übersicht</a>
+  <a href="10-theme-problem.html">Nächste →</a>
+</div>
+
+</div>
+
+</body>
+</html>
